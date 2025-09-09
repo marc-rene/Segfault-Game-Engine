@@ -9,6 +9,7 @@ PREMAKE_PATH = Path()
 EDITOR_PATH = Path()
 
 def findPremakePath() -> bool:
+    global PREMAKE_PATH
     premake = shutil.which('premake5')
     logging.debug(f"Checking if {premake} is legit?")
     if premake:
@@ -26,7 +27,8 @@ def findPremakePath() -> bool:
             return False
 
 def findEditorPath() -> bool:
-    luaBuild = Path(__file__).parent.parent / "SegFault Editor/build_editor.lua"
+    global EDITOR_PATH
+    luaBuild = Path(__file__).parent.parent / "Build.lua"
     logging.debug(f"Attempting to find lua build at {luaBuild.absolute()}")
     logging.debug(f"Lua build is file: {luaBuild.is_file()}")
     if luaBuild.is_file():
@@ -40,19 +42,31 @@ def findEditorPath() -> bool:
     
     
 def main():
+    global PREMAKE_PATH 
+    global EDITOR_PATH
+    
     if IS_WINDOWS == False:
         print("""   HEY! 
             I HAVEN'T TESTED THIS ON LINUX OR MAC
             ...Just fyi!
             """)
     logging.basicConfig(level=logging.INFO,
-                        format="[%(levelname)s]\t: %(message)s")
-    
+                        format="[%(levelname)s]\t: %(message)s",
+                        handlers=[
+                        logging.FileHandler("Build attempt.log"),
+                        logging.StreamHandler()
+                    ])
     logging.info(f"Running Setup using { "Windows" if IS_WINDOWS else "BASH" } setup")
-    
+
     if (findPremakePath() and findEditorPath()) == False:
         logging.error("Some crap went down!")
-
+    else:
+        command = f"\"{PREMAKE_PATH.absolute()}\" --file=\"{EDITOR_PATH.absolute()}\" vs2022"
+        if not IS_WINDOWS: logging.warning(f"We don't know if {command} will run properly on linux, you've been warned!")
+        logging.info(f"All seems good so we're going to run {command}")
+        logging.info("Output is as follows:")
+        logging.info(os.popen(command).read())
+        
     
     
 

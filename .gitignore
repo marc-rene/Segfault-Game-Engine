@@ -37,5 +37,26 @@
 *.out
 *.app
 
+# Files
+*.log
+*.txt
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+*.sln
+*.temp
+*/imgui.ini
+Makefile
+
 # debug information files
 *.dwo
+
+# Directories
+.vs/
+.idea/
+Binaries/
+SegFault Editor/Vendor/imgui/examples
+SegFault Editor/Vendor/SDL/examples
+
+# Exclude
+!Setup/Binaries
