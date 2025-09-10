@@ -19,3 +19,6 @@
 [submodule "Misc/File IO/mINI"]
 	path = Misc/File IO/mINI
 	url = https://github.com/metayeti/mINI.git
+[submodule "Misc/File IO/JSON"]
+	path = Misc/File IO/JSON
+	url = https://github.com/simdjson/simdjson.git

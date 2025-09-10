@@ -7,5 +7,8 @@ staticruntime "off"
 
 files {"include/**.h", "src/**.cpp", "include/**.hpp", "src/**.c"}
 
-includedirs {"$(SolutionDir)Misc\\File IO\\mINI\\src"}
+includedirs {
+    "$(SolutionDir)Misc\\File IO\\mINI\\src",
+    "$(SolutionDir)Misc\\File IO\\JSON\\include"
+}
 

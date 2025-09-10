@@ -51,18 +51,18 @@ systemversion "latest"
 defines {}
 
 filter "configurations:Debug"
-defines {"DEBUG", "FMT_UNICODE=0"}
+defines {"DEBUG"}
 runtime "Debug"
 symbols "On"
 
 filter "configurations:Release"
-defines {"RELEASE", "FMT_UNICODE=0"}
+defines {"RELEASE"}
 runtime "Release"
 optimize "On"
 symbols "On"
 
 filter "configurations:Dist"
-defines {"DIST", "FMT_UNICODE=0"}
+defines {"DIST"}
 runtime "Release"
 optimize "On"
 symbols "Off"
