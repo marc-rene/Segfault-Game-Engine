@@ -1,19 +1,44 @@
 -- premake5.lua
 workspace "Segfault Game Engine"
-   architecture "x64"
-   configurations { "Debug", "Release", "Dist" }
-   startproject "Segfault Editor"
+architecture "x64"
+configurations {"Debug", "Release", "Dist"}
+startproject "Segfault Editor"
+defines {
+    "PROJECT_NAME=\"SegFault Engine    \"", 
+    "PROJECT_NAME_NOSPACE=\"SegFault_Engine\"",
+    "PROKECT_DISPLAY_NAME=\"SegFault Engine\""
+}
 
-   -- Workspace-wide build options for MSVC
-   filter "system:windows"
-      buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus" }
+-- Workspace-wide build options for MSVC
+filter "system:windows"
+buildoptions {"/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus", "/utf-8"}
 
 OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
 group "Utility"
-	include "Misc/Logging/build_logger.lua"
-	include "Misc/Networking/build_networking.lua"
-	include "Misc/File IO/build_fileIO.lua"
+include "Misc/Logging/build_logger.lua"
+include "Misc/Networking/build_networking.lua"
+include "Misc/File IO/build_fileIO.lua"
 group ""
-   
+
 include "SegFault Editor/build_editor.lua"
+
+filter "configurations:Debug"
+defines {"DEBUG"}
+runtime "Debug"
+symbols "On"
+staticruntime "off"
+
+filter "configurations:Release"
+defines {"RELEASE"}
+runtime "Release"
+optimize "On"
+symbols "On"
+staticruntime "on"
+
+filter "configurations:Dist"
+defines {"DIST"}
+runtime "Release"
+optimize "On"
+symbols "Off"
+staticruntime "on"

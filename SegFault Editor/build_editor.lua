@@ -3,22 +3,23 @@ kind "ConsoleApp"
 language "C++"
 cppdialect "C++23"
 targetdir "Binaries/%{cfg.buildcfg}"
-staticruntime "off"
+
 
 files {"src/**.h", "src/**.cpp", "src/**.hpp"}
 
-includedirs {   "$(SolutionDir)SegFault Editor\\Vendor\\NVRHI\\include", 
-                "$(SolutionDir)SegFault Editor\\Vendor\\imgui", 
-                "$(SolutionDir)SegFault Editor\\Vendor\\SDL\\include",
+includedirs {
+    "$(SolutionDir)SegFault Editor\\Vendor\\NVRHI\\include", 
+    "$(SolutionDir)SegFault Editor\\Vendor\\imgui",
+    "$(SolutionDir)SegFault Editor\\Vendor\\SDL\\include",
+    "$(SolutionDir)Misc\\File IO\\include", 
+    "$(SolutionDir)Misc\\Logging\\include",
+    "$(SolutionDir)Misc\\Logging\\spdlog\\include", -- spdlog weirdness
+    "$(SolutionDir)Misc\\Networking\\include", 
+    "$(SolutionDir)Misc\\Math\\DirectXMath\\Inc",
+    "$(SolutionDir)Misc\\Math\\DirectXMathExtended\\include"
 
-                -- Include Modules
-                "$(SolutionDir)Misc\\File IO\\include",
-                "$(SolutionDir)Misc\\Logging\\include",
-                "$(SolutionDir)Misc\\Networking\\include",
-
-                "$(SolutionDir)Misc\\Math\\DirectXMath\\Inc",
-                "$(SolutionDir)Misc\\Math\\DirectXMathExtended\\include"
 }
+
 
 -- Link our modules
 links {"Tout", "File_Wizard", "Packet_Ninja", "d3d12"}
@@ -54,15 +55,18 @@ filter "configurations:Debug"
 defines {"DEBUG"}
 runtime "Debug"
 symbols "On"
+staticruntime "off"
 
 filter "configurations:Release"
 defines {"RELEASE"}
 runtime "Release"
 optimize "On"
 symbols "On"
+staticruntime "on"
 
 filter "configurations:Dist"
 defines {"DIST"}
 runtime "Release"
 optimize "On"
 symbols "Off"
+staticruntime "on"
