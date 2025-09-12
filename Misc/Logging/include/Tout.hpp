@@ -126,10 +126,10 @@ namespace TOUT_LOG
         try                                                                                                                           \
         {                                                                                                                             \
             TOUT_LOG::GetLogger(log_errorLogName)->critical(__VA_ARGS__);                                                             \
-            std::cerr << std::format("\n!!!CHORNOBYL REACTOR 4\nCHORNOBYL REACTOR 4: {}!!!\n", e.what()) << std::format(__VA_ARGS__); \
-            std::cout << std::format("\n!!!CHORNOBYL REACTOR 4\nCHORNOBYL REACTOR 4: {}!!!\n", e.what()) << std::format(__VA_ARGS__); \
+            std::cerr << std::format("\n!!!CHORNOBYL REACTOR 4\nCHORNOBYL REACTOR 4:") << std::format(__VA_ARGS__); \
+            std::cout << std::format("\n!!!CHORNOBYL REACTOR 4\nCHORNOBYL REACTOR 4:") << std::format(__VA_ARGS__); \
         }                                                                                                                             \
-        catch (const std::exception &)                                                                                                \
+        catch (const std::exception &e)                                                                                                \
         {                                                                                                                             \
             std::cout << std::format("\n!!!THINGS ARE SO BAD WE CANT EVEN SAY OUR CRITICAL BECAUSE: {}!!!\n", e.what());              \
         }                                                                                                                             \

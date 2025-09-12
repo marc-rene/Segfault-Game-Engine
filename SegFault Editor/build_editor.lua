@@ -3,26 +3,23 @@ kind "ConsoleApp"
 language "C++"
 cppdialect "C++23"
 targetdir "Binaries/%{cfg.buildcfg}"
+defines {"NVRHI_WITH_DX12"}
+files {"src/**.h", "src/**.cpp", "src/**.hpp", "Vendor/imgui/*.cpp", "Vendor/imgui/*.h", "Vendor/imgui/*.hpp",
+       "Vendor/imgui/backends/imgui_impl_dx12.cpp", "Vendor/imgui/backends/imgui_impl_dx12.h",
+       "Vendor/imgui/backends/imgui_impl_sdl3.cpp", "Vendor/imgui/backends/imgui_impl_sdl3.h"}
 
-
-files {"src/**.h", "src/**.cpp", "src/**.hpp"}
-
-includedirs {
-    "$(SolutionDir)SegFault Editor\\Vendor\\NVRHI\\include", 
-    "$(SolutionDir)SegFault Editor\\Vendor\\imgui",
-    "$(SolutionDir)SegFault Editor\\Vendor\\SDL\\include",
-    "$(SolutionDir)Misc\\File IO\\include", 
-    "$(SolutionDir)Misc\\Logging\\include",
-    "$(SolutionDir)Misc\\Logging\\spdlog\\include", -- spdlog weirdness
-    "$(SolutionDir)Misc\\Networking\\include", 
-    "$(SolutionDir)Misc\\Math\\DirectXMath\\Inc",
-    "$(SolutionDir)Misc\\Math\\DirectXMathExtended\\include"
-
-}
-
+includedirs {"$(SolutionDir)SegFault Editor\\Vendor\\NVRHI\\include", "$(SolutionDir)SegFault Editor\\Vendor\\imgui",
+             "$(SolutionDir)SegFault Editor\\Vendor\\SDL\\include", "$(SolutionDir)Misc\\File IO\\include",
+             "$(SolutionDir)Misc\\Logging\\include", "$(SolutionDir)Misc\\Logging\\spdlog\\include", -- spdlog weirdness
+             "$(SolutionDir)Misc\\Networking\\include", "$(SolutionDir)Misc\\Math\\DirectXMath\\Inc",
+             "$(SolutionDir)Misc\\Math\\DirectXMathExtended\\include",
+             "$(SolutionDir)SegFault Editor\\Vendor\\NVRHI\\include",
+             "$(SolutionDir)SegFault Editor\\Vendor\\SDL\\include"}
+libdirs {"$(SolutionDir)SegFault Editor\\Vendor\\SDL\\VisualC\\x64\\Debug"}
 
 -- Link our modules
-links {"Tout", "File_Wizard", "Packet_Ninja", "d3d12"}
+links {"Tout", "File_Wizard", "Packet_Ninja", "d3d12",
+       "$(SolutionDir)SegFault Editor\\Vendor\\NVRHI\\build\\Release\\nvrhi.lib", "SDL3"}
 
 -- Create virtual paths for modules
 --[[

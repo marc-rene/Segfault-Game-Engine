@@ -13,9 +13,6 @@
 [submodule "Misc/Networking/GameNetworkingSockets"]
 	path = Misc/Networking/GameNetworkingSockets
 	url = https://github.com/ValveSoftware/GameNetworkingSockets.git
-[submodule "SegFault Editor/Vendor/NVRHI"]
-	path = SegFault Editor/Vendor/NVRHI
-	url = https://github.com/NVIDIA-RTX/NVRHI.git
 [submodule "Misc/File IO/mINI"]
 	path = Misc/File IO/mINI
 	url = https://github.com/metayeti/mINI.git
