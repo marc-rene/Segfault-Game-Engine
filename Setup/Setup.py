@@ -40,6 +40,9 @@ def findEditorPath() -> bool:
         logging.error("You'll have to run 'premake5.exe --file=<path to build_editor.lua> vs2022'")
         return False
     
+# TODO: Automate building and linking SDL
+def buildSDL():
+    pass 
     
 def main():
     global PREMAKE_PATH 

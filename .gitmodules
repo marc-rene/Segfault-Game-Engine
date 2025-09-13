@@ -19,3 +19,6 @@
 [submodule "Misc/File IO/JSON"]
 	path = Misc/File IO/JSON
 	url = https://github.com/simdjson/simdjson.git
+[submodule "SegFault Editor/Vendor/DirectXTK12"]
+	path = SegFault Editor/Vendor/DirectXTK12
+	url = https://github.com/microsoft/DirectXTK12.git
