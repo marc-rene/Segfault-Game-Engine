@@ -23,10 +23,197 @@
 
 
 
-//
+// ---------------------------------------------------------------------------------------
+// Now we use FMOD
+// ---------------------------------------------------------------------------------------
+
+bool DaftPunk::Player::Initialise()
+{
+	b_IsInitialised.store(false);
+	FMOD_RESULT result = FMOD::Studio::System::create(&System_Instance, FMOD_VERSION);
+
+	switch (result)
+	{
+	case FMOD_OK:
+		dp_INFO("Successfully made a FMOD system object");
+		break;
+	default:
+		dp_ERROR("Could NOT make an FMOD system object because we got {} instead of FMOD_OK", FMOD_ErrorString(result));
+		return false;
+		break;
+	}
+
+	result = System_Instance->initialize(AUDIO_MAX_CHANNELS, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0);
+	switch (result)
+	{
+	case FMOD_OK:
+		dp_INFO("Successfully Initialised our FMOD system");
+		break;
+	default:
+		dp_ERROR("Could NOT Init our FMOD system because we got {} instead of FMOD_OK", FMOD_ErrorString(result));
+		return false;
+		break;
+	}
+
+	try
+	{
+		Tick_thread = std::thread([]()
+			{
+				while (DaftPunk::Player::b_IsRunning.load())
+				{
+					DaftPunk::Player::Tick();
+					std::this_thread::sleep_for(std::chrono::milliseconds(AUDIO_TICK_RATE));
+				}
+			});
+
+		b_IsInitialised.store(true);
+	}
+	catch (const std::exception& e)
+	{
+		dp_ERROR("DaftPunk player thread messed up!!\nsaying: {}", e.what());
+		b_IsRunning.store(false);
+		b_IsInitialised.store(false);
+
+		if (System_Instance != nullptr)
+		{
+			System_Instance->unloadAll();
+			System_Instance->release();
+			System_Instance = nullptr;
+		}
+		return false;
+	}
+
+	return b_IsInitialised.load();
+}
+
+
+void DaftPunk::Player::Shutdown()
+{
+	dp_INFO("Shutting down FMOD Studio player");
+
+	b_IsRunning.store(false);
+	b_IsInitialised.store(false);
+	if (Tick_thread.joinable())
+		Tick_thread.join();
+
+	Tick_thread.~thread();
+
+	//UnloadAllBanks();
+
+	if (System_Instance != nullptr)
+	{
+		System_Instance->unloadAll();
+		System_Instance->flushCommands();
+		System_Instance->release();
+	}
+}
+
+
+UINT8 DaftPunk::Player::AllIsGood()
+{
+	if (System_Instance == nullptr)
+	{
+		dp_ERROR("Our System instance is banjaxxed and null");
+		return 1;
+	}
+	if (b_IsInitialised.load() == false)
+	{
+		dp_ERROR("We have never been initialised, please run DaftPunk::Player::Initialise() and pray it returns true");
+		return 2;
+	}
+	
+
+	return 0; // All Quiet on the Daft Front
+}
+
+void DaftPunk::Player::Tick()
+{
+	if (AllIsGood() != 0)
+	{
+		dp_WARN
+		return;
+	}
+
+	FMOD_RESULT result = s_studio_system->update();
+	if (result != FMOD_OK)
+	{
+		Check_Result(result, "FMOD::Studio::System::update");
+	}
+
+	std::lock_guard<std::mutex> stream_lock(s_stream_mutex);
+	for (auto iterator = s_active_streams.begin(); iterator != s_active_streams.end();)
+	{
+		FMOD::Channel* channel = iterator->first;
+		FMOD::Sound* sound = iterator->second;
+
+		bool is_playing = false;
+		FMOD_RESULT channel_result = FMOD_OK;
+		if (channel != nullptr)
+		{
+			channel_result = channel->isPlaying(&is_playing);
+		}
+
+		if (channel == nullptr || channel_result == FMOD_ERR_CHANNEL_STOLEN || channel_result == FMOD_ERR_INVALID_HANDLE)
+		{
+			is_playing = false;
+		}
+		else if (channel_result != FMOD_OK)
+		{
+			const char* error_string = FMOD_ErrorString(channel_result);
+			dp_WARN("FMOD channel query failed: {}", error_string != nullptr ? error_string : "Unknown FMOD error");
+			is_playing = false;
+		}
+
+		if (!is_playing)
+		{
+			if (channel != nullptr)
+			{
+				channel->stop();
+			}
+			if (sound != nullptr)
+			{
+				sound->release();
+			}
+			iterator = s_active_streams.erase(iterator);
+		}
+		else
+		{
+			++iterator;
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+// ---------------------------------------------------------------------------------------
+// Legacy Code
+// TODO: Delete this XAudio2 crap
+// ---------------------------------------------------------------------------------------
 // Callback handlers, only implement the buffer events for maintaining play state
 //
-void DaftPunk::Engine::SoundCallbackHander::OnVoiceProcessingPassStart(UINT32 /*bytesRequired*/)
+void DaftPunk::Engine::SoundCallbackHander::OnVoiceProcessingPassStart(UINT32 bytesRequired)
 {
 	// Triggers EVERY TICK
 	//dp_TRACE("OnVoiceProcessingPassStart Triggered!");
@@ -40,22 +227,22 @@ void DaftPunk::Engine::SoundCallbackHander::OnStreamEnd()
 {
 	dp_TRACE("OnStreamEnd Triggered!");
 }
-void DaftPunk::Engine::SoundCallbackHander::OnBufferStart(void* /*bufferContext*/)
+void DaftPunk::Engine::SoundCallbackHander::OnBufferStart(void* bufferContext)
 {
 	dp_TRACE("OnBufferStart Triggered!");
 	m_isPlayingHolder = true;
 }
-void DaftPunk::Engine::SoundCallbackHander::OnBufferEnd(void* /*bufferContext*/)
+void DaftPunk::Engine::SoundCallbackHander::OnBufferEnd(void* bufferContext)
 {
 	dp_TRACE("OnBufferEnd Triggered!");
 
 	m_isPlayingHolder = false;
 }
-void DaftPunk::Engine::SoundCallbackHander::OnLoopEnd(void* /*bufferContext*/)
+void DaftPunk::Engine::SoundCallbackHander::OnLoopEnd(void* bufferContext)
 {
 	dp_TRACE("OnLoopEnd Triggered!");
 }
-void DaftPunk::Engine::SoundCallbackHander::OnVoiceError(void* /*bufferContext*/, HRESULT /*error*/)
+void DaftPunk::Engine::SoundCallbackHander::OnVoiceError(void* bufferContext, HRESULT error)
 {
 	dp_TRACE("OnVoiceError Triggered!");
 }
@@ -298,3 +485,4 @@ unsigned long DaftPunk::PlaySoundFromFile(std::filesystem::path p_FilePath)
 
 	return true;
 }
+*/

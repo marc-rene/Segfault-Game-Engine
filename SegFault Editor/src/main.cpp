@@ -62,7 +62,7 @@ int main()
 
 	// This is where hell begins
 	// First we Sort out the audio engine 
-	DaftPunk::Engine::Init();
+	DaftPunk::Player::Initialise();
 	
 	// THEN we do SDL goodness
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD) == false)
@@ -95,8 +95,8 @@ int main()
 
 	static bool enable_vsync = false;
 	
-	Tarantino::b_isRunning = true;
-	while (Tarantino::b_isRunning)
+	Tarantino::b_isRunning.store(true);
+	while (Tarantino::b_isRunning.load() == true)
 	{
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
@@ -132,8 +132,8 @@ int main()
 
 		if (ImGui::Button("Test Audio"))
 		{
-			DaftPunk::PlaySoundFromFile(std::filesystem::path("found_lost_audio_22kHz_24bitPcm_trim.wav"));
-			
+			OhSHITc("HEY! WE haven't gotten FMOD working yet");
+			//DaftPunk::PlaySoundFromFile(std::filesystem::path("found_lost_audio_22kHz_24bitPcm_trim.wav
 		}
 		
 		
@@ -186,6 +186,8 @@ int main()
 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplSDL3_Shutdown();
+	DaftPunk::Player::Shutdown();
+
 	ImGui::DestroyContext();
 
 	Tarantino::Graphics::DX12::CleanupDeviceD3D();

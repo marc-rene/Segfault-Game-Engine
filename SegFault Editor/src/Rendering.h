@@ -30,7 +30,7 @@ struct Tarantino
 	static bool initialise();
 	static void run();
 	static bool shutdown();
-	static inline bool b_isRunning = false;
+	static inline std::atomic<bool> b_isRunning = false;
 
 	struct Graphics
 	{
