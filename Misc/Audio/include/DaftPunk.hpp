@@ -5,6 +5,8 @@
 
 #include "Tout.hpp"
 
+#include <fmod.h>
+
 #define dp_NAME "Daft Punk          "
 #define dp_NAME_ns "Daft_Punk"
 

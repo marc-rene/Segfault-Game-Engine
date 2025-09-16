@@ -10,7 +10,14 @@ files {"include/**.h", "src/**.cpp", "include/**.hpp", "src/**.c"}
 
 includedirs {
     "$(SolutionDir)Misc\\Logging\\include",
-    "$(SolutionDir)Misc\\Logging\\spdlog\\include"}
+    "$(SolutionDir)Misc\\Logging\\spdlog\\include",
+    "C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Studio API Windows\\api\\core\\inc" -- TODO: Come up with some way of finding this out automatically
+
+}
+
+links {
+    "C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Studio API Windows\\api\\core\\lib\\x64\\fmod_vc.lib"
+}
 
 filter "configurations:Debug"
 defines {"DEBUG"}

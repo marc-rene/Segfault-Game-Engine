@@ -6,10 +6,16 @@ targetdir "Binaries/%{cfg.buildcfg}"
 staticruntime "off"
 links {"Tout"}
 
-files {"include/**.h", "src/**.cpp", "include/**.hpp", "src/**.c"}
+files { "include/**.h", 
+        "include/**.hpp", 
+        "src/**.cpp", 
+        "src/**.c"
+    }
 
-includedirs {"$(SolutionDir)Misc\\File IO\\mINI\\src", "$(SolutionDir)Misc\\File IO\\JSON\\include",
-             "$(SolutionDir)Misc\\Logging\\include", "$(SolutionDir)Misc\\Logging\\spdlog\\include"}
+includedirs {   "$(SolutionDir)Misc\\File IO\\mINI\\src", 
+                "$(SolutionDir)Misc\\File IO\\JSON\\include",
+                "$(SolutionDir)Misc\\Logging\\include", 
+                "$(SolutionDir)Misc\\Logging\\spdlog\\include"}
 
 filter "configurations:Debug"
 defines {"DEBUG"}
