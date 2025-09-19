@@ -8,6 +8,7 @@
 #include <fmod.h>
 #include <fmod_studio.hpp>
 #include <fmod_errors.h>
+#include <fmod_common.h>
 
 #define dp_NAME "Daft Punk          "
 #define dp_NAME_ns "Daft_Punk"
@@ -80,10 +81,15 @@ struct DaftPunk
 		static UINT8 AllIsGood();
 		static void Tick();
 
-		inline static FMOD::Studio::System* System_Instance = nullptr;
+		static bool PlaySound_2D_FromFile(std::filesystem::path file_path, FMOD_MODE = FMOD_2D);
+		static bool PlaySound_2D_FromFile(std::filesystem::path* file_path, FMOD_MODE = FMOD_2D);
+
+		inline static FMOD::System* system_instance = nullptr;
 		inline static std::atomic<bool> b_IsRunning = false;
 		inline static std::atomic<bool> b_IsInitialised = false;
-		inline static std::thread Tick_thread;
+		inline static std::thread tick_thread;
+		inline static std::mutex mutex_stream;
+		inline static std::map<FMOD::Channel*, FMOD::Sound*> active_streams_map;
 
 	private:
 		/*

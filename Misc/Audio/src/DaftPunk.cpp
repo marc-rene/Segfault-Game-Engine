@@ -30,7 +30,7 @@
 bool DaftPunk::Player::Initialise()
 {
 	b_IsInitialised.store(false);
-	FMOD_RESULT result = FMOD::Studio::System::create(&System_Instance, FMOD_VERSION);
+	FMOD_RESULT result = FMOD::System_Create(&system_instance, FMOD_VERSION);
 
 	switch (result)
 	{
@@ -43,7 +43,7 @@ bool DaftPunk::Player::Initialise()
 		break;
 	}
 
-	result = System_Instance->initialize(AUDIO_MAX_CHANNELS, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0);
+	result = system_instance->init(AUDIO_MAX_CHANNELS, FMOD_INIT_NORMAL, 0);
 	switch (result)
 	{
 	case FMOD_OK:
@@ -57,7 +57,7 @@ bool DaftPunk::Player::Initialise()
 
 	try
 	{
-		Tick_thread = std::thread([]()
+		tick_thread = std::thread([]()
 			{
 				while (DaftPunk::Player::b_IsRunning.load())
 				{
@@ -74,11 +74,11 @@ bool DaftPunk::Player::Initialise()
 		b_IsRunning.store(false);
 		b_IsInitialised.store(false);
 
-		if (System_Instance != nullptr)
+		if (system_instance != nullptr)
 		{
-			System_Instance->unloadAll();
-			System_Instance->release();
-			System_Instance = nullptr;
+			system_instance->release();
+			system_instance->close();
+			system_instance = nullptr;
 		}
 		return false;
 	}
@@ -93,25 +93,24 @@ void DaftPunk::Player::Shutdown()
 
 	b_IsRunning.store(false);
 	b_IsInitialised.store(false);
-	if (Tick_thread.joinable())
-		Tick_thread.join();
+	if (tick_thread.joinable())
+		tick_thread.join();
 
-	Tick_thread.~thread();
+	tick_thread.~thread();
 
 	//UnloadAllBanks();
 
-	if (System_Instance != nullptr)
+	if (system_instance != nullptr)
 	{
-		System_Instance->unloadAll();
-		System_Instance->flushCommands();
-		System_Instance->release();
+		system_instance->release();
+		system_instance->close();
 	}
 }
 
 
 UINT8 DaftPunk::Player::AllIsGood()
 {
-	if (System_Instance == nullptr)
+	if (system_instance == nullptr)
 	{
 		dp_ERROR("Our System instance is banjaxxed and null");
 		return 1;
@@ -121,7 +120,7 @@ UINT8 DaftPunk::Player::AllIsGood()
 		dp_ERROR("We have never been initialised, please run DaftPunk::Player::Initialise() and pray it returns true");
 		return 2;
 	}
-	
+
 
 	return 0; // All Quiet on the Daft Front
 }
@@ -130,55 +129,40 @@ void DaftPunk::Player::Tick()
 {
 	if (AllIsGood() != 0)
 	{
-		dp_WARN
+		dp_WARN("God DAMN we got SOMETHING happening!");
 		return;
 	}
 
-	FMOD_RESULT result = s_studio_system->update();
-	if (result != FMOD_OK)
-	{
-		Check_Result(result, "FMOD::Studio::System::update");
-	}
+	system_instance->update();
 
-	std::lock_guard<std::mutex> stream_lock(s_stream_mutex);
-	for (auto iterator = s_active_streams.begin(); iterator != s_active_streams.end();)
-	{
-		FMOD::Channel* channel = iterator->first;
-		FMOD::Sound* sound = iterator->second;
+	std::scoped_lock stream_lock(mutex_stream);
+	for (const std::pair<FMOD::Channel*, FMOD::Sound*>& stream : active_streams_map) {
 
-		bool is_playing = false;
+		static bool is_playing;
+		is_playing = false;
 		FMOD_RESULT channel_result = FMOD_OK;
-		if (channel != nullptr)
-		{
-			channel_result = channel->isPlaying(&is_playing);
-		}
 
-		if (channel == nullptr || channel_result == FMOD_ERR_CHANNEL_STOLEN || channel_result == FMOD_ERR_INVALID_HANDLE)
+		if (stream.first != nullptr)
+			channel_result = stream.first->isPlaying(&is_playing);
+
+		if (stream.first == nullptr
+			|| channel_result == FMOD_ERR_CHANNEL_STOLEN
+			|| channel_result == FMOD_ERR_INVALID_HANDLE
+			|| channel_result != FMOD_OK)
 		{
-			is_playing = false;
-		}
-		else if (channel_result != FMOD_OK)
-		{
-			const char* error_string = FMOD_ErrorString(channel_result);
-			dp_WARN("FMOD channel query failed: {}", error_string != nullptr ? error_string : "Unknown FMOD error");
+			dp_WARN("FMOD channel failed because: {}", FMOD_ErrorString(channel_result));
 			is_playing = false;
 		}
 
-		if (!is_playing)
+		if (is_playing == false)
 		{
-			if (channel != nullptr)
-			{
-				channel->stop();
-			}
-			if (sound != nullptr)
-			{
-				sound->release();
-			}
-			iterator = s_active_streams.erase(iterator);
-		}
-		else
-		{
-			++iterator;
+			if (stream.first != nullptr)
+				stream.first->stop();
+
+			if (stream.second != nullptr)
+				stream.second->release();
+
+			active_streams_map.erase(stream.first);// s_active_streams.erase(iterator);
 		}
 	}
 }
@@ -186,8 +170,54 @@ void DaftPunk::Player::Tick()
 
 
 
+bool DaftPunk::Player::PlaySound_2D_FromFile(std::filesystem::path* p_file_path, FMOD_MODE p_mode)
+{
+	if (AllIsGood() != 0)
+		return false;
 
+	if (p_file_path->empty() 
+		|| std::filesystem::exists(*p_file_path) == false
+		|| std::filesystem::is_regular_file(*p_file_path) == false)
+	{
+		dp_WARN("Yo... How the hell do you think I'm supposed to magically know what sound to play? BRUH.ogg ????????\ngive me a proper std::filesystem::path");
+		return false;
+	}
 
+	FMOD::Sound* sound = nullptr;
+	FMOD_RESULT result;
+	result = system_instance->createSound(p_file_path->string().c_str(), p_mode, nullptr, &sound);
+	if (result != FMOD_OK)
+	{
+		dp_ERROR("Huge fuck up playing {} because\n{}", p_file_path->string(), FMOD_ErrorString(result));
+		return false;
+	}
+	result = sound->setMode(p_mode);
+
+	FMOD::Channel* channel = 0;
+	if (result != FMOD_OK)
+	{
+		dp_ERROR("HOW THE HELL DID SETTING THE MODE FOR OUR SOUND CAUSE AN ERROR???? CONFUSION!");
+		return false;
+	}
+
+	result = system_instance->playSound(sound, 0, false, &channel);
+	if (result != FMOD_OK)
+	{
+		dp_ERROR("We cocked up playing the sound!");
+		sound->release();
+		return false;
+	}
+	//std::scoped_lock lock(mutex_stream);
+	//active_streams_map[channel] = sound;
+
+	dp_INFO("Streaming sound {}", p_file_path->string());
+	return true;
+}
+
+bool DaftPunk::Player::PlaySound_2D_FromFile(std::filesystem::path p_file_path, FMOD_MODE p_mode)
+{
+	return PlaySound_2D_FromFile(&p_file_path, p_mode);
+}
 
 
 
