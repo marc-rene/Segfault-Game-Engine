@@ -22,3 +22,6 @@
 [submodule "SegFault Editor/Vendor/DirectXTK12"]
 	path = SegFault Editor/Vendor/DirectXTK12
 	url = https://github.com/microsoft/DirectXTK12.git
+[submodule "SegFault Editor/Vendor/ENTT"]
+	path = SegFault Editor/Vendor/ENTT
+	url = https://github.com/skypjack/entt.git

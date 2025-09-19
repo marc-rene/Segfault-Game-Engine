@@ -74,15 +74,26 @@ struct DaftPunk
 		*/
 	};
 
+	// TODO: REWRITE THIS TERRIBLENESS
 	struct Player
 	{
 		static bool Initialise();
 		static void Shutdown();
 		static UINT8 AllIsGood();
-		static void Tick();
+		static void Tick(); // TODO: Rewrite because calling FMOD update crashes everything
 
+		// PlaySound_2D_FromFile is GUARATEED to cause memory leak because it's never freed afterwards
+		// TODO: Rewrite
 		static bool PlaySound_2D_FromFile(std::filesystem::path file_path, FMOD_MODE = FMOD_2D);
 		static bool PlaySound_2D_FromFile(std::filesystem::path* file_path, FMOD_MODE = FMOD_2D);
+
+		// This NEVER fires even after saying channel->setCallback()
+		// TODO: Rewrite or come up with a version that doesn't suck
+		static FMOD_RESULT ChannelEndCallback(
+			FMOD_CHANNELCONTROL* chancontrol,
+			FMOD_CHANNELCONTROL_TYPE controltype,
+			FMOD_CHANNELCONTROL_CALLBACK_TYPE type,
+			void* commanddata1, void* commanddata2);
 
 		inline static FMOD::System* system_instance = nullptr;
 		inline static std::atomic<bool> b_IsRunning = false;
@@ -91,17 +102,6 @@ struct DaftPunk
 		inline static std::mutex mutex_stream;
 		inline static std::map<FMOD::Channel*, FMOD::Sound*> active_streams_map;
 
-	private:
-		/*
-		inline static std::atomic<bool> s_keep_running{ false };
-		inline static bool s_is_initialised = false;
-		inline static FMOD::System* s_core_system = nullptr;
-		inline static std::thread s_update_thread;
-		inline static std::mutex s_initialise_mutex;
-		inline static std::mutex s_bank_mutex;
-		inline static std::mutex s_stream_mutex;
-		inline static std::unordered_map<std::string, FMOD::Studio::Bank*> s_loaded_banks;
-		inline static std::unordered_map<FMOD::Channel*, FMOD::Sound*> s_active_streams;
-		*/
+
 	};
 };

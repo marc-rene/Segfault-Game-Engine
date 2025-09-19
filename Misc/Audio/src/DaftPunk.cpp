@@ -133,40 +133,51 @@ void DaftPunk::Player::Tick()
 		return;
 	}
 
-	system_instance->update();
+	{
+		std::scoped_lock stream_lock(mutex_stream);
+		for (const std::pair<FMOD::Channel*, FMOD::Sound*>& stream : active_streams_map) {
 
-	std::scoped_lock stream_lock(mutex_stream);
-	for (const std::pair<FMOD::Channel*, FMOD::Sound*>& stream : active_streams_map) {
+			static bool is_playing;
+			static FMOD_RESULT channel_result;
 
-		static bool is_playing;
-		is_playing = false;
-		FMOD_RESULT channel_result = FMOD_OK;
-
-		if (stream.first != nullptr)
-			channel_result = stream.first->isPlaying(&is_playing);
-
-		if (stream.first == nullptr
-			|| channel_result == FMOD_ERR_CHANNEL_STOLEN
-			|| channel_result == FMOD_ERR_INVALID_HANDLE
-			|| channel_result != FMOD_OK)
-		{
-			dp_WARN("FMOD channel failed because: {}", FMOD_ErrorString(channel_result));
+			channel_result = FMOD_OK;
 			is_playing = false;
-		}
 
-		if (is_playing == false)
-		{
 			if (stream.first != nullptr)
-				stream.first->stop();
+				channel_result = stream.first->isPlaying(&is_playing);
 
-			if (stream.second != nullptr)
-				stream.second->release();
+			if (stream.first == nullptr
+				|| channel_result == FMOD_ERR_CHANNEL_STOLEN
+				|| channel_result == FMOD_ERR_INVALID_HANDLE
+				|| channel_result != FMOD_OK)
+			{
+				dp_WARN("FMOD channel failed because: {}", FMOD_ErrorString(channel_result));
+				is_playing = false;
+			}
 
-			active_streams_map.erase(stream.first);// s_active_streams.erase(iterator);
+			if (is_playing == false)
+			{
+				int channelID;
+				char* soundName = (char*)malloc(64);
+				stream.first->getIndex(&channelID);
+				stream.second->getName(soundName, 63);
+
+				dp_INFO("Channel {} is no longer playing {} so we'll drop them", channelID, soundName);
+				if (stream.first != nullptr)
+					stream.first->stop();
+
+				if (stream.second != nullptr)
+					stream.second->release();
+
+				free(soundName);
+				active_streams_map.erase(stream.first);// s_active_streams.erase(iterator);
+			}
 		}
 	}
-}
 
+
+	//system_instance->update();
+}
 
 
 
@@ -175,7 +186,7 @@ bool DaftPunk::Player::PlaySound_2D_FromFile(std::filesystem::path* p_file_path,
 	if (AllIsGood() != 0)
 		return false;
 
-	if (p_file_path->empty() 
+	if (p_file_path->empty()
 		|| std::filesystem::exists(*p_file_path) == false
 		|| std::filesystem::is_regular_file(*p_file_path) == false)
 	{
@@ -191,9 +202,10 @@ bool DaftPunk::Player::PlaySound_2D_FromFile(std::filesystem::path* p_file_path,
 		dp_ERROR("Huge fuck up playing {} because\n{}", p_file_path->string(), FMOD_ErrorString(result));
 		return false;
 	}
-	result = sound->setMode(p_mode);
 
 	FMOD::Channel* channel = 0;
+
+	result = sound->setMode(p_mode);
 	if (result != FMOD_OK)
 	{
 		dp_ERROR("HOW THE HELL DID SETTING THE MODE FOR OUR SOUND CAUSE AN ERROR???? CONFUSION!");
@@ -207,8 +219,14 @@ bool DaftPunk::Player::PlaySound_2D_FromFile(std::filesystem::path* p_file_path,
 		sound->release();
 		return false;
 	}
-	//std::scoped_lock lock(mutex_stream);
-	//active_streams_map[channel] = sound;
+
+	channel->setUserData(sound);
+	channel->setCallback(&DaftPunk::Player::ChannelEndCallback);
+
+	{
+		//std::scoped_lock lock(mutex_stream);
+		//active_streams_map[channel] = sound;
+	}
 
 	dp_INFO("Streaming sound {}", p_file_path->string());
 	return true;
@@ -220,6 +238,39 @@ bool DaftPunk::Player::PlaySound_2D_FromFile(std::filesystem::path p_file_path, 
 }
 
 
+
+FMOD_RESULT DaftPunk::Player::ChannelEndCallback(
+	FMOD_CHANNELCONTROL* chancontrol,
+	FMOD_CHANNELCONTROL_TYPE controltype,
+	FMOD_CHANNELCONTROL_CALLBACK_TYPE type,
+	void*, void*)
+{
+	dp_TRACE("Callback was called!");
+
+	if (controltype != FMOD_CHANNELCONTROL_CHANNEL)
+		return FMOD_OK;
+
+	if (type != FMOD_CHANNELCONTROL_CALLBACK_END)
+		return FMOD_OK;
+
+	FMOD::Channel* channel = reinterpret_cast<FMOD::Channel*>(chancontrol);
+
+	// We stored the FMOD::Sound* as user data
+	FMOD::Sound* sound = nullptr;
+	channel->getUserData(reinterpret_cast<void**>(&sound));
+
+	if (sound) {
+		sound->release();               // free sound memory
+	}
+
+	// If you also track it in a map, remove it
+	{
+		//std::scoped_lock lock(mutex_stream);
+		//active_streams_map.erase(channel);
+	}
+
+	return FMOD_OK;
+}
 
 
 

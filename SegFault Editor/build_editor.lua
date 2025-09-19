@@ -9,6 +9,8 @@ files {"src/**.h", "src/**.cpp", "src/**.hpp", "Vendor/imgui/*.cpp", "Vendor/img
        "Vendor/imgui/backends/imgui_impl_sdl3.cpp", "Vendor/imgui/backends/imgui_impl_sdl3.h"}
 
 includedirs {
+       "$(SolutionDir)SegFault Editor\\Vendor\\DirectXTK12\\Inc",
+       "$(SolutionDir)SegFault Editor\\Vendor\\ENTT\\single_include",
        "$(SolutionDir)SegFault Editor\\Vendor\\imgui",
        "$(SolutionDir)SegFault Editor\\Vendor\\SDL\\include",
 

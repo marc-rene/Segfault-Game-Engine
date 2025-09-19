@@ -35,7 +35,8 @@ using Microsoft::WRL::ComPtr;
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_dx12.h"
 
-#include "Rendering.h"
+#include "Rendering.hpp"
+#include "Level.hpp"
 
 // Custom Windows
 #include "ImGui Windows/AudioDebug.hpp"
@@ -96,7 +97,7 @@ int main()
 	ImGui_ImplSDL3_InitForD3D(Tarantino::Window::SDL_MainWindow);
 	ImGui_ImplDX12_Init(&local_imgui_settings.Init_Info);
 
-	static bool enable_vsync = false;
+	Level::LINK_Test();
 	
 	Tarantino::b_isRunning.store(true);
 	while (Tarantino::b_isRunning.load() == true)
@@ -127,9 +128,9 @@ int main()
 
 		ImGui::Text("Deltatime: %f", Tarantino::Graphics::GetDeltaTime_Render());
 		ImGui::Text("fps: %f", Tarantino::Graphics::GetFPS_Render());
-		ImGui::Text(enable_vsync ? "V-sync on" : "V-sync off");
+		ImGui::Text(Tarantino::Graphics::Settings::r_enable_vsync ? "V-sync on" : "V-sync off");
 		if (ImGui::Button("Toggle V-Sync"))
-			enable_vsync = !enable_vsync;
+			Tarantino::Graphics::Settings::r_enable_vsync = !Tarantino::Graphics::Settings::r_enable_vsync;
 
 		ImGui::Text("Test .Wav file found: %d", std::filesystem::is_regular_file(std::filesystem::path("found_lost_audio_22kHz_24bitPcm_trim.wav")));
 
@@ -148,50 +149,11 @@ int main()
 
 		ImGui::Render();
 
-		static Tarantino::Graphics::DX12::FrameContext* frameCtx;
-		static UINT backBufferIdx;
-		
-		frameCtx = Tarantino::Graphics::DX12::WaitForNextFrameResources();
-		backBufferIdx = Tarantino::Graphics::DX12::g_pSwapChain->GetCurrentBackBufferIndex();
-		frameCtx->CommandAllocator->Reset();
-
-		static D3D12_RESOURCE_BARRIER barrier = {};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = Tarantino::Graphics::DX12::g_mainRenderTargetResource[backBufferIdx];
-		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-
-		Tarantino::Graphics::DX12::g_pd3dCommandList->Reset(frameCtx->CommandAllocator, nullptr);
-		Tarantino::Graphics::DX12::g_pd3dCommandList->ResourceBarrier(1, &barrier);
-
-		// Render Dear ImGui graphics
-		static const float clear_color_with_alpha[4] = { 0 };
-		Tarantino::Graphics::DX12::g_pd3dCommandList->ClearRenderTargetView(Tarantino::Graphics::DX12::g_mainRenderTargetDescriptor[backBufferIdx], clear_color_with_alpha, 0, nullptr);
-		Tarantino::Graphics::DX12::g_pd3dCommandList->OMSetRenderTargets(1, &Tarantino::Graphics::DX12::g_mainRenderTargetDescriptor[backBufferIdx], FALSE, nullptr);
-		Tarantino::Graphics::DX12::g_pd3dCommandList->SetDescriptorHeaps(1, &Tarantino::Graphics::DX12::g_pd3dSrvDescHeap);
-
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), Tarantino::Graphics::DX12::g_pd3dCommandList);
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-		Tarantino::Graphics::DX12::g_pd3dCommandList->ResourceBarrier(1, &barrier);
-		Tarantino::Graphics::DX12::g_pd3dCommandList->Close();
-
-		Tarantino::Graphics::DX12::g_pd3dCommandQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&Tarantino::Graphics::DX12::g_pd3dCommandList);
-
-		// Present
-		//HRESULT hr = GraphicsManager::Graphics::DX12::g_pSwapChain->Present(1, 0);   // Yay vsync
-		static HRESULT hr;
-		hr = Tarantino::Graphics::DX12::g_pSwapChain->Present(enable_vsync, 0);   // nay vsync
-		Tarantino::Graphics::DX12::g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
-
-		static UINT64 fenceValue;
-		fenceValue = Tarantino::Graphics::DX12::g_fenceLastSignaledValue + 1;
-		Tarantino::Graphics::DX12::g_pd3dCommandQueue->Signal(Tarantino::Graphics::DX12::g_fence, fenceValue);
-		Tarantino::Graphics::DX12::g_fenceLastSignaledValue = fenceValue;
-		frameCtx->FenceValue = fenceValue;
+		DaftPunk::Player::Tick();
+		Tarantino::Graphics::FinishRenderFrame();
 	}
+		
+
 	Tarantino::Graphics::WaitForLastSubmittedFrame();
 
 	ImGui_ImplDX12_Shutdown();

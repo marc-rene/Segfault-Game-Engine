@@ -1,36 +1,35 @@
-#include "Rendering.h"
+#include "Rendering.hpp"
 
 
 
 void Tarantino::Graphics::WaitForLastSubmittedFrame()
 {
-	Tarantino::Graphics::DX12::FrameContext* frameCtx = &Tarantino::Graphics::DX12::g_frameContext[Tarantino::Graphics::DX12::g_frameIndex % Tarantino::Graphics::APP_NUM_FRAMES_IN_FLIGHT];
+	DX12::FrameContext* frameCtx = &DX12::g_frameContext[DX12::g_frameIndex % APP_NUM_FRAMES_IN_FLIGHT];
 
 	UINT64 fenceValue = frameCtx->FenceValue;
 	if (fenceValue == 0)
 		return; // No fence was signaled
 
 	frameCtx->FenceValue = 0;
-	if (Tarantino::Graphics::DX12::g_fence->GetCompletedValue() >= fenceValue)
+	if (DX12::g_fence->GetCompletedValue() >= fenceValue)
 		return;
 
-	Tarantino::Graphics::DX12::g_fence->SetEventOnCompletion(fenceValue, Tarantino::Graphics::DX12::g_fenceEvent);
-	WaitForSingleObject(Tarantino::Graphics::DX12::g_fenceEvent, INFINITE);
-
+	DX12::g_fence->SetEventOnCompletion(fenceValue, DX12::g_fenceEvent);
+	WaitForSingleObject(DX12::g_fenceEvent, INFINITE);
 }
 
 
 
 void Tarantino::Graphics::CleanupRenderTarget()
 {
-	Tarantino::Graphics::WaitForLastSubmittedFrame();
+	WaitForLastSubmittedFrame();
 
-	for (UINT i = 0; i < Tarantino::Graphics::APP_NUM_BACK_BUFFERS; i++)
+	for (UINT i = 0; i < APP_NUM_BACK_BUFFERS; i++)
 	{
-		if (Tarantino::Graphics::DX12::g_mainRenderTargetResource[i])
+		if (DX12::g_mainRenderTargetResource[i])
 		{
-			Tarantino::Graphics::DX12::g_mainRenderTargetResource[i]->Release();
-			Tarantino::Graphics::DX12::g_mainRenderTargetResource[i] = nullptr;
+			DX12::g_mainRenderTargetResource[i]->Release();
+			DX12::g_mainRenderTargetResource[i] = nullptr;
 		}
 	}
 }
@@ -46,6 +45,70 @@ void Tarantino::Graphics::CreateRenderTarget()
 		Tarantino::Graphics::DX12::g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, Tarantino::Graphics::DX12::g_mainRenderTargetDescriptor[i]);
 		Tarantino::Graphics::DX12::g_mainRenderTargetResource[i] = pBackBuffer;
 	}
+}
+
+
+
+void Tarantino::Graphics::DX12::StartFrame()
+{
+	m_pCurrentFrameResource->Init();
+
+	// Indicate that the back buffer will be used as a render target.
+	m_pCurrentFrameResource->m_commandLists[CommandListPre]->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_renderTargets[m_frameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
+	// Clear the render target and depth stencil.
+	const float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap->GetCPUDescriptorHandleForHeapStart(), m_frameIndex, m_rtvDescriptorSize);
+	m_pCurrentFrameResource->m_commandLists[CommandListPre]->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+	m_pCurrentFrameResource->m_commandLists[CommandListPre]->ClearDepthStencilView(m_dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+	ThrowIfFailed(m_pCurrentFrameResource->m_commandLists[CommandListPre]->Close());
+}
+
+void Tarantino::Graphics::FinishRenderFrame()
+{
+	static Tarantino::Graphics::DX12::FrameContext* frameCtx;
+	static UINT backBufferIdx;
+	static D3D12_RESOURCE_BARRIER barrier = {};
+	static const float clear_color_with_alpha[4] = { 0.1f, 0, 0, 1 };
+	static HRESULT hr;
+	static UINT64 fenceValue;
+
+	frameCtx = DX12::WaitForNextFrameResources();
+	backBufferIdx = DX12::g_pSwapChain->GetCurrentBackBufferIndex();
+	frameCtx->CommandAllocator->Reset();
+
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = DX12::g_mainRenderTargetResource[backBufferIdx];
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+	DX12::g_pd3dCommandList->Reset(frameCtx->CommandAllocator, nullptr);
+	DX12::g_pd3dCommandList->ResourceBarrier(1, &barrier);
+
+	DX12::g_pd3dCommandList->ClearRenderTargetView(DX12::g_mainRenderTargetDescriptor[backBufferIdx], clear_color_with_alpha, 0, nullptr);
+	DX12::g_pd3dCommandList->OMSetRenderTargets(1, &DX12::g_mainRenderTargetDescriptor[backBufferIdx], FALSE, nullptr);
+	DX12::g_pd3dCommandList->SetDescriptorHeaps(1, &DX12::g_pd3dSrvDescHeap);
+
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), DX12::g_pd3dCommandList);
+	
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	DX12::g_pd3dCommandList->ResourceBarrier(1, &barrier);
+	DX12::g_pd3dCommandList->Close();
+
+	DX12::g_pd3dCommandQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&DX12::g_pd3dCommandList);
+
+	// Present
+	hr = DX12::g_pSwapChain->Present(Settings::r_enable_vsync, 0);   // vsync
+	DX12::g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
+
+	fenceValue = DX12::g_fenceLastSignaledValue + 1;
+	DX12::g_pd3dCommandQueue->Signal(DX12::g_fence, fenceValue);
+	DX12::g_fenceLastSignaledValue = fenceValue;
+	frameCtx->FenceValue = fenceValue;
 }
 
 
@@ -121,7 +184,11 @@ void Tarantino::Graphics::DX12::CleanupDeviceD3D()
 	}
 
 	for (UINT i = 0; i < APP_NUM_FRAMES_IN_FLIGHT; i++)
-		if (g_frameContext[i].CommandAllocator) { g_frameContext[i].CommandAllocator->Release(); g_frameContext[i].CommandAllocator = nullptr; }
+		if (g_frameContext[i].CommandAllocator) 
+		{
+			g_frameContext[i].CommandAllocator->Release();
+			g_frameContext[i].CommandAllocator = nullptr;
+		}
 
 	if (g_pd3dCommandQueue) { g_pd3dCommandQueue->Release(); g_pd3dCommandQueue = nullptr; }
 	if (g_pd3dCommandList) { g_pd3dCommandList->Release(); g_pd3dCommandList = nullptr; }
@@ -164,11 +231,11 @@ bool Tarantino::Graphics::DX12::CreateDeviceD3D(HWND hwnd)
 	}
 
 	// [DEBUG] Enable debug interface
-	#ifdef DX12_ENABLE_DEBUG_LAYER
+#ifdef DX12_ENABLE_DEBUG_LAYER
 	ID3D12Debug* pdx12Debug = nullptr;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&pdx12Debug))))
 		pdx12Debug->EnableDebugLayer();
-	#endif
+#endif
 
 	// Create device
 	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
@@ -176,7 +243,7 @@ bool Tarantino::Graphics::DX12::CreateDeviceD3D(HWND hwnd)
 		return false;
 
 	// [DEBUG] Setup debug interface to break on any warnings/errors
-	#ifdef DX12_ENABLE_DEBUG_LAYER
+#ifdef DX12_ENABLE_DEBUG_LAYER
 	if (pdx12Debug != nullptr)
 	{
 		ID3D12InfoQueue* pInfoQueue = nullptr;
@@ -187,7 +254,7 @@ bool Tarantino::Graphics::DX12::CreateDeviceD3D(HWND hwnd)
 		pInfoQueue->Release();
 		pdx12Debug->Release();
 	}
-	#endif
+#endif
 
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
