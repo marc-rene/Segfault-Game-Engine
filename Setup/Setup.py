@@ -116,7 +116,7 @@ def main():
         logging.info("Output is as follows:")
         logging.info(os.popen(command).read())
         
-    buildSDL()
+    #buildSDL()
     
     
 

@@ -25,3 +25,6 @@
 [submodule "SegFault Editor/Vendor/ENTT"]
 	path = SegFault Editor/Vendor/ENTT
 	url = https://github.com/skypjack/entt.git
+[submodule "SegFault Editor/Vendor/DirectX_Headers"]
+	path = SegFault Editor/Vendor/DirectX_Headers
+	url = https://github.com/microsoft/DirectX-Headers.git

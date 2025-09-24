@@ -10,6 +10,8 @@ files {"src/**.h", "src/**.cpp", "src/**.hpp", "Vendor/imgui/*.cpp", "Vendor/img
 
 includedirs {
        "$(SolutionDir)SegFault Editor\\Vendor\\DirectXTK12\\Inc",
+       "$(SolutionDir)SegFault Editor\\Vendor\\DirectX_Headers\\include",
+       "$(SolutionDir)SegFault Editor\\Vendor\\DirectX_Headers\\include\\directx",
        "$(SolutionDir)SegFault Editor\\Vendor\\ENTT\\single_include",
        "$(SolutionDir)SegFault Editor\\Vendor\\imgui",
        "$(SolutionDir)SegFault Editor\\Vendor\\SDL\\include",
