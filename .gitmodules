@@ -1,30 +1,22 @@
-[submodule "SegFault Editor/Vendor/imgui"]
-	path = SegFault Editor/Vendor/imgui
-	url = https://github.com/ocornut/imgui.git
-[submodule "Misc/Math/DirectXMath"]
-	path = Misc/Math/DirectXMath
-	url = https://github.com/microsoft/DirectXMath.git
-[submodule "SegFault Editor/Vendor/SDL"]
-	path = SegFault Editor/Vendor/SDL
+
+[submodule "Platform/EnkiTS"]
+	path = Platform/EnkiTS
+	url = https://github.com/dougbinks/enkiTS.git
+[submodule "Platform/SDL"]
+	path = Platform/SDL
 	url = https://github.com/libsdl-org/SDL.git
-[submodule "Misc/Logging/spdlog"]
-	path = Misc/Logging/spdlog
+[submodule "Core/Spdlog"]
+	path = Core/Spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "Misc/Networking/GameNetworkingSockets"]
-	path = Misc/Networking/GameNetworkingSockets
-	url = https://github.com/ValveSoftware/GameNetworkingSockets.git
-[submodule "Misc/File IO/mINI"]
-	path = Misc/File IO/mINI
-	url = https://github.com/metayeti/mINI.git
-[submodule "Misc/File IO/JSON"]
-	path = Misc/File IO/JSON
-	url = https://github.com/simdjson/simdjson.git
-[submodule "SegFault Editor/Vendor/DirectXTK12"]
-	path = SegFault Editor/Vendor/DirectXTK12
+[submodule "Rendering/DirectX 12/Memory Allocator"]
+	path = Rendering/DirectX 12/Memory Allocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git
+[submodule "Rendering/DirectX 12/Toolkit"]
+	path = Rendering/DirectX 12/Toolkit
 	url = https://github.com/microsoft/DirectXTK12.git
-[submodule "SegFault Editor/Vendor/ENTT"]
-	path = SegFault Editor/Vendor/ENTT
-	url = https://github.com/skypjack/entt.git
-[submodule "SegFault Editor/Vendor/DirectX_Headers"]
-	path = SegFault Editor/Vendor/DirectX_Headers
-	url = https://github.com/microsoft/DirectX-Headers.git
+[submodule "Rendering/Imgui"]
+	path = Rendering/Imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "Networking/Game Networking Sockets"]
+	path = Networking/Game Networking Sockets
+	url = https://github.com/ValveSoftware/GameNetworkingSockets.git
