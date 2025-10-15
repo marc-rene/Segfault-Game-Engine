@@ -114,7 +114,7 @@ def main():
         if not IS_WINDOWS: logging.warning(f"We don't know if {command} will run properly on linux, you've been warned!")
         logging.info(f"All seems good so we're going to run {command}")
         logging.info("Output is as follows:")
-        logging.info(os.popen(command).read())
+        #logging.info(os.popen(command).read())
         
     #buildSDL()
     
@@ -131,7 +131,7 @@ if __name__ == "__main__":
                         handlers=[
                         logging.FileHandler("Build attempt.log"),
                         logging.StreamHandler()
-                    ])
+                    ], force=True)
     logging.info(f"Running Setup using { "Windows" if IS_WINDOWS else "BASH" } setup")
 
     main()

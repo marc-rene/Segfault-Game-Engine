@@ -20,3 +20,6 @@
 [submodule "Networking/Game Networking Sockets"]
 	path = Networking/Game Networking Sockets
 	url = https://github.com/ValveSoftware/GameNetworkingSockets.git
+[submodule "Gameplay/Navigation/Recast"]
+	path = Gameplay/Navigation/Recast
+	url = https://github.com/recastnavigation/recastnavigation.git
