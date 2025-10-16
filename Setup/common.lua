@@ -19,6 +19,7 @@ function UseCommonIncludeDirs()
         "%{wks.location}/Rendering",
         "%{wks.location}/Rendering/DirectX 12/Memory Allocator/include",
         "%{wks.location}/Rendering/Imgui",
+        "%{wks.location}/Rendering/Imgui/backends",
         "%{wks.location}/Rendering/Renderer",
         "%{wks.location}/Resources",
         "%{wks.location}/Runtime",
@@ -27,13 +28,27 @@ function UseCommonIncludeDirs()
     filter "system:windows"
         links { "dxgi", "d3d12" }
     filter {}
+
 end
+
+SDL3_Path = "%{wks.location}/Binaries/%{cfg.architecture}/%{cfg.buildcfg}/SDL/SDL3"
+Engine_Path = "%{wks.location}/Binaries/%{cfg.architecture}/%{cfg.buildcfg}/Segfault Game Engine/SegfaultGameEngine"
+
 
 function UseApocalypseEngine()
     -- Link against the static lib
-    links { "Segfault Game Engine" }
-
+    links { Engine_Path }
+    dependson { "Segfault Game Engine", "imgui_sdl3_dx12", "SDL" }
 end
+
+
+
+function SetOutputDirs()
+    targetdir ("%{wks.location}/Binaries/" .. OutputDir .. "/%{prj.name}")
+    objdir ("%{wks.location}/Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
+end
+
+
 
 -- Discover subfolders under examplesRoot and create a project per folder.
 -- callback(name, dir) is called for each discovered example.
