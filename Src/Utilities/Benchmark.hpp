@@ -9,7 +9,7 @@
 #include <numeric>
 #include <string>
 #include <vector>
-
+#include <fstream>
 
 
 namespace Engine
@@ -115,6 +115,30 @@ namespace Engine
 					<< r.med_ns << "/"
 					<< r.p95_ns << "/"
 					<< r.max_ns << "]\n";
+			}
+
+			inline void save_to_file(const std::string& filename, Result& result) {
+				std::ofstream file(filename);
+				if (!file.is_open()) {
+					std::cerr << "⚠️  Couldn't open file '" << filename << "' for writing.\n";
+					return;
+				}
+
+				file << "microbench results\n";
+				file << "==================\n\n";
+				
+					file << result.name << "\n"
+						<< "  runs=" << result.runs
+						<< "  batch=" << result.iters_per_run
+						<< "  ns/op(avg)=" << std::fixed << std::setprecision(2) << result.ns_per_op
+						<< "  ops/s≈" << std::setprecision(0) << result.ops_per_sec << "\n"
+						<< "  [min/med/p95/max ns]=["
+						<< std::setprecision(2)
+						<< result.min_ns << "/" << result.med_ns << "/" << result.p95_ns << "/" << result.max_ns << "]\n\n";
+				
+
+				file.close();
+				std::cout << "✅ Saved results to '" << filename << "'\n";
 			}
 
 		}

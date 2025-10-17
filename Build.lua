@@ -21,13 +21,6 @@ filter "system:windows"
         "/Zc:preprocessor", 
         "/Zc:__cplusplus", 
         "/utf-8", 
-        "/O2", 
-        "/Oi", 
-        "/Ot", 
-        "/GL", 
-        "/fp:fast", 
-        "/GS-", 
-        "/arch:AVX2"
     }
     linkoptions { "/LTCG", "/LTO" }
     defines {"WINDOWS"}
@@ -35,8 +28,10 @@ filter "system:windows"
 filter "configurations:Debug"
     defines {"DEBUG"}
     runtime "Debug"
+    optimize "Debug"
     symbols "On"
     staticruntime "off"
+
 
 filter "configurations:Release"
     defines {"RELEASE"}
@@ -46,6 +41,14 @@ filter "configurations:Release"
     symbols "On"
     staticruntime "on"
     flags { "linktimeoptimization", "NoIncrementalLink" }
+    buildoptions{ "/O2", 
+        "/Oi", 
+        "/Ot", 
+        "/GL", 
+        "/fp:fast", 
+        "/GS-", 
+        "/arch:AVX2"
+    }
 
 filter "configurations:Distrubtion"
     defines {"DISTRUBTION"}
@@ -55,6 +58,16 @@ filter "configurations:Distrubtion"
     symbols "Off"
     staticruntime "on"
     flags { "linktimeoptimization", "NoIncrementalLink" }
+    buildoptions {
+         "/O2", 
+        "/Oi", 
+        "/Ot", 
+        "/GL", 
+        "/fp:fast", 
+        "/GS-", 
+        "/arch:AVX2"
+    
+    }
 
 
 
