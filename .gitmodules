@@ -23,3 +23,6 @@
 [submodule "ThirdParty/Spdlog"]
 	path = ThirdParty/Spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "ThirdParty/DirectX Math"]
+	path = ThirdParty/DirectX Math
+	url = https://github.com/microsoft/DirectXMath.git
