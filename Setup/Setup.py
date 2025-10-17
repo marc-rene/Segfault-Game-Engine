@@ -47,6 +47,7 @@ def findEditorPath() -> bool:
         return False
     
     
+"""
 def win_findDevTool() -> Path:
     possiblePaths = [
         "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Visual Studio 2022\\Visual Studio Tools\\Developer Command Prompt for VS 2022.lnk",
@@ -58,14 +59,6 @@ def win_findDevTool() -> Path:
             return Path(file)
     logging.error("Crap, we didnt find the ms build tools")
     return Path()
-
-
-def findSDLPath():
-    global SDL_PATH
-    global PROJECT_PATH
-    
-    SDL_PATH = PROJECT_PATH / "SegFault Editor/Vendor/SDL"
-
 
 # TODO: Automate building and linking SDL
 def buildSDL():
@@ -101,7 +94,7 @@ def buildSDL():
 # TODO: Automate copying the .lib and .dll from SDL3
 def copySdlLib():
     pass
-
+"""
 
 def main():
     global PREMAKE_PATH 

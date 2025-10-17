@@ -16,7 +16,20 @@ workspace "Segfault"
 
 -- Workspace-wide build options for MSVC
 filter "system:windows"
-    buildoptions {"/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus", "/utf-8"}
+    buildoptions {
+        "/EHsc", 
+        "/Zc:preprocessor", 
+        "/Zc:__cplusplus", 
+        "/utf-8", 
+        "/O2", 
+        "/Oi", 
+        "/Ot", 
+        "/GL", 
+        "/fp:fast", 
+        "/GS-", 
+        "/arch:AVX2"
+    }
+    linkoptions { "/LTCG", "/LTO" }
     defines {"WINDOWS"}
 
 filter "configurations:Debug"
@@ -29,15 +42,21 @@ filter "configurations:Release"
     defines {"RELEASE"}
     runtime "Release"
     optimize "Speed"
+    floatingpoint "Fast"
     symbols "On"
     staticruntime "on"
+    flags { "linktimeoptimization", "NoIncrementalLink" }
 
 filter "configurations:Distrubtion"
     defines {"DISTRUBTION"}
     runtime "Release"
     optimize "Speed"
+    floatingpoint "Fast"
     symbols "Off"
     staticruntime "on"
+    flags { "linktimeoptimization", "NoIncrementalLink" }
+
+
 
 require "Setup/common"
 
@@ -62,7 +81,7 @@ SetOutputDirs()
 group "ThirdParty"
     -- SDL3 (no vulkan, only DirectX 12)
     externalproject "SDL"
-       location "%{wks.location}/Platform/SDL/VisualC/SDL"
+       location "%{wks.location}/ThirdParty/SDL/VisualC/SDL"
         
         -- HEY THERE! IF YOU'RE HAVING SDL PROJECT ISSUES, CHECK SDL.vcxproj IN VISUALC FOLDER AND CHECK THAT <ProjectGuid> MATCHES
         uuid "81CE8DAF-EBB2-4761-8E45-B71ABCCA8C68" 
@@ -78,30 +97,27 @@ group "ThirdParty"
         language "C++"
         cppdialect "C++20"
         files {
-            "%{wks.location}/Rendering/Imgui/imconfig.h",
-            "%{wks.location}/Rendering/Imgui/imgui.h",
-            "%{wks.location}/Rendering/Imgui/imgui.cpp",
-            "%{wks.location}/Rendering/Imgui/imgui_draw.cpp",
-            "%{wks.location}/Rendering/Imgui/imgui_tables.cpp",
-            "%{wks.location}/Rendering/Imgui/imgui_widgets.cpp",
-            
-            -- backends
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_dx12.cpp",
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_sdl3.cpp",
+            "%{wks.location}/ThirdParty/ImGui/*.h",
+            "%{wks.location}/ThirdParty/ImGui/*.hpp",
+            "%{wks.location}/ThirdParty/ImGui/*.c",
+            "%{wks.location}/ThirdParty/ImGui/*.cpp",
+            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_dx11.*",   -- JUST to be sure            
+            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_dx12.*",   -- JUST to be sure            
+            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_sdl3.*",   -- JUST to be sure
         }
         
         includedirs {
-            "%{wks.location}/Rendering/Imgui",
-            "%{wks.location}/Rendering/Imgui/backends",
-            "%{wks.location}/Platform/SDL/include",
+            "%{wks.location}/ThirdParty/ImGui",
+            "%{wks.location}/ThirdParty/SDL/include",
         }
         
-        excludes {
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_vulkan.*",
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_glfw.*",
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_sdlrenderer.*",
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_sdl2.*",
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_win32.*",
+        removefiles  {
+            "%{wks.location}/Rendering/Imgui/examples/**",
+            
+            "!%{wks.location}/Rendering/Imgui/backends/imgui_impl_dx11.*",
+            "!%{wks.location}/Rendering/Imgui/backends/imgui_impl_dx12.*",
+            "!%{wks.location}/Rendering/Imgui/backends/imgui_impl_sdl3.*",
+            "%{wks.location}/Rendering/Imgui/backends/**",
         }
 
         SetOutputDirs()
@@ -124,48 +140,24 @@ project "Segfault Game Engine"
     targetname "SegfaultGameEngine"
     SetOutputDirs()
 
-    -- THANK YOU CHATGPT FOR REWRITING THIS MESS
     files {
-        "%{wks.location}/**.c",
-        "%{wks.location}/**.cpp",
-        "%{wks.location}/**.h",
-        "%{wks.location}/**.hpp",
-        "%{wks.location}/**.inl",
-        "%{wks.location}/**.ixx",
-        "%{wks.location}/**.mm",
-        "%{wks.location}/**.hlsl",
-
-        --"%{wks.location}/Core/**.{c,cpp,h,hpp,inl,ixx,mm,hlsl}",
-        --"%{wks.location}/ECS/**.{c,cpp,h,hpp,inl,ixx,mm,hlsl}",
-        --"%{wks.location}/Gameplay/**.{c,cpp,h,hpp,inl,ixx,mm,hlsl}",
-        --"%{wks.location}/Networking/**.{c,cpp,h,hpp,inl,ixx,mm,hlsl}",
-        --"%{wks.location}/Platform/**.{c,cpp,h,hpp,inl,ixx,mm,hlsl}",
-        --"%{wks.location}/Rendering/**.{c,cpp,h,hpp,inl,ixx,mm,hlsl}",
-        --"%{wks.location}/Resources/**.{c,cpp,h,hpp,inl,ixx,mm,hlsl}",
-        --"%{wks.location}/Runtime/**.{c,cpp,h,hpp,inl,ixx,mm,hlsl}",
+        "%{wks.location}/Src/**.c",
+        "%{wks.location}/Src/**.cpp",
+        "%{wks.location}/Src/**.h",
+        "%{wks.location}/Src/**.hpp",
+        "%{wks.location}/Src/**.inl",
+        "%{wks.location}/Src/**.ixx",
+        "%{wks.location}/Src/**.mm",
+        "%{wks.location}/Src/**.hlsl",
     }
         
-    excludes {
-        "%{wks.location}/Examples/**",
-        "%{wks.location}/Setup/**",
-        "%{wks.location}/Platform/SDL/**", -- third-party is built in its own projects
-        "%{wks.location}/Core/Spdlog/**",
-        "%{wks.location}/Core/Math/**",
-        "%{wks.location}/ECS/entt.hpp",
-        "%{wks.location}/Platform/EnkiTS/**",
-        "%{wks.location}/Platform/SDL/**/vulkan/**",
-        "%{wks.location}/Rendering/Imgui/backends/imgui_impl_vulkan.*",
-        "%{wks.location}/Rendering/Imgui/backends/imgui_impl_vulkan.*",
-        "%{wks.location}/Rendering/DirectX 12/Memory Allocator/**",
-        "%{wks.location}/Rendering/DirectX 12/Toolkit/**",
-        "%{wks.location}/Gameplay/Navigation/Recast/**",
-        "%{wks.location}/Networking/Game Networking Sockets/**",
+    removefiles  {
+
     }
     
     UseCommonIncludeDirs()
     
-    links { SDL3_Path, 
-    "imgui_sdl3_dx12" }
+    links { "SDL", "imgui_sdl3_dx12" }
     dependson { "SDL" }
 
 
