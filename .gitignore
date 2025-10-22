@@ -491,3 +491,4 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+EngineConfig.ini

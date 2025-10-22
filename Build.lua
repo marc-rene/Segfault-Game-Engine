@@ -154,6 +154,7 @@ project "Segfault Game Engine"
     SetOutputDirs()
 
     files {
+        "%{wks.location}/Include/*",
         "%{wks.location}/Src/**.c",
         "%{wks.location}/Src/**.cpp",
         "%{wks.location}/Src/**.h",

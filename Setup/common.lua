@@ -2,31 +2,15 @@ local M = {}
 
 function UseCommonIncludeDirs()
     includedirs {
-        "%{wks.location}/Src",
-        "%{wks.location}/Src/Core/Math",
-        "%{wks.location}/Src/Core/Spdlog/include",
-        "%{wks.location}/Src/ECS",
-        "%{wks.location}/Src/Gameplay",
-        "%{wks.location}/Src/Gameplay/Navigation/Recast/Recast/Include",
-        "%{wks.location}/Src/Gameplay/Navigation/Recast/Detour/Include",
-        "%{wks.location}/Src/Gameplay/Navigation/Recast/DetourTileCache/Include",
-        "%{wks.location}/Src/Networking",
-        "%{wks.location}/Src/Networking/Game Networking Sockets/include",
-        "%{wks.location}/Src/Platform",
-        "%{wks.location}/Src/Platform/EnkiTS/src",
-        "%{wks.location}/Src/Platform/SDL/include",
-        "%{wks.location}/Src/Rendering",
-        "%{wks.location}/Src/Rendering/Imgui",
-        "%{wks.location}/Src/Rendering/Imgui/backends",
-        "%{wks.location}/Src/Rendering/Renderer",
-        "%{wks.location}/Src/Resources",
-        "%{wks.location}/Src/Runtime",
-
+        "%{wks.location}/Include",
+        
         "%{wks.location}/ThirdParty/DirectX 12 Memory Allocator/include",
         "%{wks.location}/ThirdParty/DirectX 12 Toolkit/Inc",
+        "%{wks.location}/ThirdParty/DirectX Math/Inc",
         "%{wks.location}/ThirdParty/EnkiTS/src",
         "%{wks.location}/ThirdParty/Game Networking Sockets/include",
         "%{wks.location}/ThirdParty/ImGui",
+        "%{wks.location}/ThirdParty/ImGui/backends",
         "%{wks.location}/ThirdParty/Recast Navigation/Detour/Include",
         "%{wks.location}/ThirdParty/Recast Navigation/Recast/Include",
         "%{wks.location}/ThirdParty/Recast Navigation/DebugUtils/Include",
@@ -40,7 +24,7 @@ function UseCommonIncludeDirs()
 
 end
 
-SDL3_Path = "%{wks.location}/Binaries/%{cfg.architecture}/%{cfg.buildcfg}/SDL/SDL3"
+
 Engine_Path = "%{wks.location}/Binaries/%{cfg.architecture}/%{cfg.buildcfg}/Segfault Game Engine/SegfaultGameEngine"
 
 
