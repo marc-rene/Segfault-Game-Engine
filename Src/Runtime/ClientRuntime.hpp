@@ -1,5 +1,7 @@
 #include "TypeDefinitions.hpp"
 #include "../Platform/File Wizard.hpp"
+#include "../Platform/Window.hpp"
+
 
 namespace ENGINE::Runtime
 {
@@ -8,9 +10,6 @@ namespace ENGINE::Runtime
 	{
 	public:
 		/*
-		// These are how we expect these to go IN CHRONOLOGICAL ORDER
-		virtual void On_Initialise();
-
 		// Render ticks (1-1000 ticks a second)
 		virtual void On_First_Ever_Frame();
 		virtual void On_Frame_Start();		// early frame: events, paused?
@@ -28,10 +27,16 @@ namespace ENGINE::Runtime
 
 		virtual void On_Shutdown();
 		*/
+		
 		ClientRuntime()
 		{
 			ENGINE::Log::Init_Log();
 			ENGINE::Log::Init_Err_Log();
+			ENGINE::Platform::WindowManager ClientWindowManager;
+			
+			// INIT SDL Window
+			//
+
 		}
 
 		~ClientRuntime()

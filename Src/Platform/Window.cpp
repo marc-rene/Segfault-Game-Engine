@@ -13,18 +13,20 @@ bool ENGINE::Platform::WindowManager::Initialise()
 		flags |= SDL_INIT_AUDIO;
 		flags |= SDL_INIT_EVENTS;
 
+		std::map<ENGINE::Settings::E_Settings, bool>* settings_ref = ENGINE::Settings::ActiveSettings::GetActiveSettings()->GetBoolConfigVars();
 
-		if (ENGINE::Settings::ActiveSettings::GetInputSettings()->GetValue_bool(ENGINE::Settings::E_Settings::INPUT_ENABLE_JOYSTICK) == true) {
+		if (settings_ref->at(ENGINE::Settings::E_Settings::INPUT_ENABLE_JOYSTICK) == true) 
+		{
 			TRACE(WINDOW_MANAGER_NAME, "Enabling Joystick");
 			flags |= SDL_INIT_JOYSTICK;
 		}
 
-		if (ENGINE::Settings::ActiveSettings::GetInputSettings()->GetValue_bool(ENGINE::Settings::E_Settings::INPUT_ENABLE_HAPTICS) == true) {
+		if (settings_ref->at(ENGINE::Settings::E_Settings::INPUT_ENABLE_HAPTICS) == true) {
 			TRACE(WINDOW_MANAGER_NAME, "Enabling Haptic feedback");
 			flags |= SDL_INIT_HAPTIC;
 		}
 
-		if (ENGINE::Settings::ActiveSettings::GetInputSettings()->GetValue_bool(ENGINE::Settings::E_Settings::INPUT_ENABLE_GAMEPAD) == true) {
+		if (settings_ref->at(ENGINE::Settings::E_Settings::INPUT_ENABLE_GAMEPAD) == true) {
 			TRACE(WINDOW_MANAGER_NAME, "Enabling Gamepad");
 			flags |= SDL_INIT_GAMEPAD;
 		}

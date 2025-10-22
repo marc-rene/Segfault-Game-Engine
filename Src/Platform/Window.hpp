@@ -18,54 +18,18 @@ namespace ENGINE::Settings
 		int int_preferredWindowWidth = 1280;
 		int int_preferredWindowHeight = 720;
 
+		bool SetSettingsFromConfig() override
+		{
+			int_preferredWindowWidth = ENGINE::Platform::FileIO::Config::GetSetting_int("Window", "Width");
+			int_preferredWindowHeight = ENGINE::Platform::FileIO::Config::GetSetting_int("Window", "Height");
+
+			return true;
+		}
 		
 
+		
 
-		bool GetValue_bool(E_Settings SettingID) override
-		{
-			switch (SettingID)
-			{
-			case WINDOW_IS_FULLSCREEN:
-				return (SDLFlag_windowProperties & SDL_WINDOW_FULLSCREEN);
-			case WINDOW_IS_BORDERLESS:
-				return (SDLFlag_windowProperties & SDL_WINDOW_BORDERLESS);
-			case WINDOW_IS_RESIZABLE:
-				return (SDLFlag_windowProperties & SDL_WINDOW_RESIZABLE);
-			case WINDOW_IS_MINIMISED:
-				return (SDLFlag_windowProperties & SDL_WINDOW_MINIMIZED);
-			case WINDOW_IS_MAXIMISED:
-				return (SDLFlag_windowProperties & SDL_WINDOW_MAXIMIZED);
-			case WINDOW_IS_ALWAYS_ON_TOP:
-				return (SDLFlag_windowProperties & SDL_WINDOW_ALWAYS_ON_TOP);
-			default:
-				WARNc("Window settings has no idea (E_Settings enum type) is");
-				return false;
-			}
-		}
-
-		uFatty* GetValue_int(E_Settings SettingID) override
-		{
-			switch (SettingID)
-			{
-			case WINDOW_PREFERRED_WIDTH:
-				return reinterpret_cast<uFatty*>(&int_preferredWindowWidth);
-
-			case WINDOW_PREFERRED_HEIGHT:
-				return reinterpret_cast<uFatty*>(&int_preferredWindowHeight);
-			}
-		}
-
-		std::string* GetValue_str(E_Settings SettingID) override
-		{
-			switch (SettingID)
-			{
-			case WINDOW_TITLE:
-				return &DefaultWindowTitle;
-			default:
-				static std::string invalidName = "Invalid Name";
-				return &invalidName;
-			}
-		}
+		
 	};
 }
 

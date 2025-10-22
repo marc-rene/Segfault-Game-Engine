@@ -19,12 +19,12 @@ namespace ENGINE::Platform::FileIO
 		{
 			if (ready == false)
 				initialise();
-			
+
 			mutex_lock config_lock(mut_config_lock);
 			bool overwriting = ini_structure.get(Section).has(value);
 
 			ini_structure[Section][Key] = value;
-			
+
 			TRACEc("Runtime Config {} [{}] [{}] to {}", overwriting ? "overwriting" : "set", Section, Key, value);
 			return true;
 		}
@@ -33,7 +33,7 @@ namespace ENGINE::Platform::FileIO
 		{
 			if (ready == false)
 				initialise();
-			
+
 			mutex_lock config_lock(mut_config_lock);
 
 			if (createIfNotExist) {
@@ -51,6 +51,37 @@ namespace ENGINE::Platform::FileIO
 
 				return exists;
 			}
+		}
+
+
+
+		inline static bool GetSetting_bool(std::string Section, std::string Key, bool Default = false)
+		{
+			std::string temp_str;
+			if (GetSetting(Section, Key, temp_str))
+			{
+				bool result = std::stoi(temp_str.c_str());
+				return result;
+			}
+			else
+			{ 
+				INFOc("Couldn't find {} so we're setting as default: {}", Key, Default);
+				return Default;
+			}
+		}
+		
+
+		
+		inline static int GetSetting_int(std::string Section, std::string Key)
+		{
+			std::string* temp_str;
+			if (GetSetting(Section, Key, *temp_str))
+			{
+				int result = std::stoi(temp_str->c_str());
+				return result;
+			}
+			else
+				return 0;
 		}
 
 		inline static void Flush() // Make sure that we dont have the entire Config in memory at all times
@@ -109,6 +140,7 @@ namespace ENGINE::Platform::FileIO
 
 	private:
 		inline static mINI::INIFile* ini_config_ref;
+
 		inline static mINI::INIStructure ini_structure;
 		inline static bool ready = false;
 		inline static std::mutex mut_config_lock;
