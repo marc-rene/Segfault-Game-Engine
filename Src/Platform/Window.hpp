@@ -1,6 +1,8 @@
 #pragma once
 
 #include "SDL3/SDL.h"
+#include "SDL3/SDL_timer.h"
+#include "SDL3/SDL_keyboard.h"
 
 #include "../Resources/EngineSettings.hpp"
 
@@ -14,7 +16,7 @@ namespace ENGINE::Settings
 		std::string DefaultWindowTitle = "HAVE WE SEGFAULTED YET?";
 
 
-		SDL_WindowFlags SDLFlag_windowProperties;
+		SDL_WindowFlags SDLFlag_windowProperties = SDL_WINDOW_RESIZABLE;
 		int int_preferredWindowWidth = 1280;
 		int int_preferredWindowHeight = 720;
 
@@ -25,11 +27,6 @@ namespace ENGINE::Settings
 
 			return true;
 		}
-		
-
-		
-
-		
 	};
 }
 
@@ -53,7 +50,7 @@ namespace ENGINE::Platform
 
 	private:
 		bool b_isInitialised = false;
-		SDL_Window* m_MainSDLWindow;
+		inline static SDL_Window* m_MainSDLWindow;
 		ENGINE::Settings::WindowSettings m_windowSettings;
 
 	};// WindowManager

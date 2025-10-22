@@ -4,16 +4,16 @@ function UseCommonIncludeDirs()
     includedirs {
         "%{wks.location}/Include",
         
-        "%{wks.location}/ThirdParty/DirectX 12 Memory Allocator/include",
-        "%{wks.location}/ThirdParty/DirectX 12 Toolkit/Inc",
-        "%{wks.location}/ThirdParty/DirectX Math/Inc",
+        "%{wks.location}/ThirdParty/DirectX_12_Memory_Allocator/include",
+        "%{wks.location}/ThirdParty/DirectX_12_Toolkit/Inc",
+        "%{wks.location}/ThirdParty/DirectX_Math/Inc",
         "%{wks.location}/ThirdParty/EnkiTS/src",
-        "%{wks.location}/ThirdParty/Game Networking Sockets/include",
+        "%{wks.location}/ThirdParty/Game_Networking_Sockets/include",
         "%{wks.location}/ThirdParty/ImGui",
         "%{wks.location}/ThirdParty/ImGui/backends",
-        "%{wks.location}/ThirdParty/Recast Navigation/Detour/Include",
-        "%{wks.location}/ThirdParty/Recast Navigation/Recast/Include",
-        "%{wks.location}/ThirdParty/Recast Navigation/DebugUtils/Include",
+        "%{wks.location}/ThirdParty/Recast_Navigation/Detour/Include",
+        "%{wks.location}/ThirdParty/Recast_Navigation/Recast/Include",
+        "%{wks.location}/ThirdParty/Recast_Navigation/DebugUtils/Include",
         "%{wks.location}/ThirdParty/SDL/include",
         "%{wks.location}/ThirdParty/Spdlog/include",
     }

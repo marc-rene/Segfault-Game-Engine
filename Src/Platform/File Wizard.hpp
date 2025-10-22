@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <mutex>
 
-#define CONFIG_FILE_NAME "Config\\EngineConfig.ini"
+#define CONFIG_FILE_NAME "EngineConfig.ini"
 
 
 
@@ -60,28 +60,45 @@ namespace ENGINE::Platform::FileIO
 			std::string temp_str;
 			if (GetSetting(Section, Key, temp_str))
 			{
-				bool result = std::stoi(temp_str.c_str());
-				return result;
+				try
+				{
+					bool result = std::stoi(temp_str.c_str());
+					return result;
+				}
+				catch (const std::exception& e)
+				{
+					WARNc("Couldn't find value {} because {}\n so will set it to default: {}", Key, e.what(), Default);
+				}
 			}
 			else
-			{ 
-				INFOc("Couldn't find {} so we're setting as default: {}", Key, Default);
+			{
+				WARNc("Couldn't find {} so we're setting as default: {}", Key, Default);
 				return Default;
 			}
 		}
-		
 
-		
-		inline static int GetSetting_int(std::string Section, std::string Key)
+
+
+		inline static int GetSetting_int(std::string Section, std::string Key, int Default = 0)
 		{
-			std::string* temp_str;
-			if (GetSetting(Section, Key, *temp_str))
+			std::string temp_str;
+			if (GetSetting(Section, Key, temp_str))
 			{
-				int result = std::stoi(temp_str->c_str());
-				return result;
+				try
+				{
+					int result = std::stoi(temp_str.c_str());
+					return result;
+				}
+				catch (const std::exception& e)
+				{
+					WARNc("Couldn't find value {} because {}\n so will set it to default: {}", Key, e.what(), Default);
+				}
 			}
 			else
-				return 0;
+			{
+				WARNc("Couldn't find {} so we're setting as default: {}", Key, Default);
+				return Default;
+			}
 		}
 
 		inline static void Flush() // Make sure that we dont have the entire Config in memory at all times
@@ -118,11 +135,11 @@ namespace ENGINE::Platform::FileIO
 					static mINI::INIFile config_file(CONFIG_FILE_NAME);
 					ini_config_ref = &config_file;
 
-					#ifdef WINDOWS
+#ifdef WINDOWS
 					ini_structure["About"]["OS"] = "Windows";
-					#else
+#else
 					ini_structure["About"]["OS"] = "Other";
-					#endif
+#endif
 
 					if (exists == false)
 						ini_config_ref->generate(ini_structure, true);

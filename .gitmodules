@@ -1,4 +1,3 @@
-
 [submodule "ThirdParty/EnkiTS"]
 	path = ThirdParty/EnkiTS
 	url = https://github.com/dougbinks/enkiTS.git
@@ -8,3 +7,21 @@
 [submodule "ThirdParty/Spdlog"]
 	path = ThirdParty/Spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "ThirdParty/DirectX_12_Toolkit"]
+	path = ThirdParty/DirectX_12_Toolkit
+	url = https://github.com/microsoft/DirectXTK12.git
+[submodule "ThirdParty/DirectX_12_Memory_Allocator"]
+	path = ThirdParty/DirectX_12_Memory_Allocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git
+[submodule "ThirdParty/DirectX_Math"]
+	path = ThirdParty/DirectX_Math
+	url = https://github.com/microsoft/DirectXMath.git
+[submodule "ThirdParty/Recast_Navigation"]
+	path = ThirdParty/Recast_Navigation
+	url = https://github.com/recastnavigation/recastnavigation.git
+[submodule "ThirdParty/Game_Networking_Sockets"]
+	path = ThirdParty/Game_Networking_Sockets
+	url = https://github.com/ValveSoftware/GameNetworkingSockets.git
+[submodule "ThirdParty/SDL"]
+	path = ThirdParty/SDL
+	url = https://github.com/libsdl-org/SDL.git

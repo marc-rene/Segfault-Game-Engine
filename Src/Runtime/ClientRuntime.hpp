@@ -1,3 +1,5 @@
+#pragma once
+
 #include "TypeDefinitions.hpp"
 #include "../Platform/File Wizard.hpp"
 #include "../Platform/Window.hpp"
@@ -33,10 +35,12 @@ namespace ENGINE::Runtime
 			ENGINE::Log::Init_Log();
 			ENGINE::Log::Init_Err_Log();
 			ENGINE::Platform::WindowManager ClientWindowManager;
-			
-			// INIT SDL Window
-			//
 
+			ClientWindowManager.Initialise();
+
+			ENGINE::Settings::WindowSettings windowsSettings;
+
+			ClientWindowManager.CreateMainWindow(&windowsSettings);
 		}
 
 		~ClientRuntime()
