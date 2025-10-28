@@ -131,7 +131,7 @@ mint ENGINE::Platform::WindowManager::PollEvents()
         ERROR(WINDOW_MANAGER_NAME, "How is a unInitialised Window supposed to get any events?");
 
     SDL_Event event;
-
+        
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_EVENT_QUIT) {
             return 0;

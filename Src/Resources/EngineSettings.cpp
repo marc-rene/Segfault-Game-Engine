@@ -12,25 +12,25 @@ bool ENGINE::Settings::ActiveSettings::Initialise()
 
 	//Input Settings First
 	E_Settings NEXT = E_Settings::INPUT_ENABLE_JOYSTICK;
-	HotMap_mint[NEXT]	=	fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT), false);		NEXT = E_Settings::INPUT_ENABLE_HAPTICS;
-	HotMap_mint[NEXT]	=	fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT), false);		NEXT = E_Settings::INPUT_ENABLE_GAMEPAD;
-	HotMap_mint[NEXT]	=	fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT), false);		
+	HotMap_mint[NEXT] = fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT), false);		
+	
+	NEXT = E_Settings::INPUT_ENABLE_HAPTICS;	HotMap_mint[NEXT] = fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT), false);		
+	NEXT = E_Settings::INPUT_ENABLE_GAMEPAD;	HotMap_mint[NEXT] = fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT), false);		
 
 	//Window Settings
 	NEXT = E_Settings::WINDOW_TITLE;
 	HotMap_str	[NEXT]	= fw::Config::GetSetting_str	(GetSettingsPrefix(NEXT),	ToString(NEXT),		"TODO: Dont have a terrible default.. Change Me in EngineConfig.ini");	
 	
-	NEXT = E_Settings::WINDOW_PREFERRED_WIDTH;
-	HotMap_int	[NEXT]	= fw::Config::GetSetting_int	(GetSettingsPrefix(NEXT),	ToString(NEXT),		1920	);	NEXT = E_Settings::WINDOW_MINIMUM_WIDTH;
-	HotMap_int	[NEXT]	= fw::Config::GetSetting_int	(GetSettingsPrefix(NEXT),	ToString(NEXT),		800		);	NEXT = E_Settings::WINDOW_PREFERRED_HEIGHT;
-	HotMap_int	[NEXT]	= fw::Config::GetSetting_int	(GetSettingsPrefix(NEXT),	ToString(NEXT),		1080	);	NEXT = E_Settings::WINDOW_MINIMUM_HEIGHT;
-	HotMap_int	[NEXT]	= fw::Config::GetSetting_int	(GetSettingsPrefix(NEXT),	ToString(NEXT),		600		);	NEXT = E_Settings::WINDOW_IS_FULLSCREEN;
-	HotMap_mint	[NEXT]	= fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT),	ToString(NEXT),		false	);	NEXT = E_Settings::WINDOW_IS_BORDERLESS;
-	HotMap_mint	[NEXT]	= fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT),	ToString(NEXT),		false	);	NEXT = E_Settings::WINDOW_IS_RESIZABLE;
-	HotMap_mint	[NEXT]	= fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT),	ToString(NEXT),		false	);	NEXT = E_Settings::WINDOW_IS_MINIMISED;
-	HotMap_mint	[NEXT]	= fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT),	ToString(NEXT),		true	);	NEXT = E_Settings::WINDOW_IS_MAXIMISED;
-	HotMap_mint	[NEXT]	= fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT),	ToString(NEXT),		false	);	NEXT = E_Settings::WINDOW_IS_ALWAYS_ON_TOP;
-	HotMap_mint	[NEXT]	= fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT),	ToString(NEXT),		true	);	
+	NEXT = E_Settings::WINDOW_PREFERRED_WIDTH;	HotMap_int [NEXT] = fw::Config::GetSetting_int	(GetSettingsPrefix(NEXT), ToString(NEXT),	1920	);
+	NEXT = E_Settings::WINDOW_MINIMUM_WIDTH;	HotMap_int [NEXT] = fw::Config::GetSetting_int	(GetSettingsPrefix(NEXT), ToString(NEXT),	800		);
+	NEXT = E_Settings::WINDOW_PREFERRED_HEIGHT;	HotMap_int [NEXT] = fw::Config::GetSetting_int	(GetSettingsPrefix(NEXT), ToString(NEXT),	1080	);
+	NEXT = E_Settings::WINDOW_MINIMUM_HEIGHT;	HotMap_int [NEXT] = fw::Config::GetSetting_int	(GetSettingsPrefix(NEXT), ToString(NEXT),	600		);
+	NEXT = E_Settings::WINDOW_IS_FULLSCREEN;	HotMap_mint[NEXT] = fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT),	false	);
+	NEXT = E_Settings::WINDOW_IS_BORDERLESS;	HotMap_mint[NEXT] = fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT),	false	);
+	NEXT = E_Settings::WINDOW_IS_RESIZABLE;		HotMap_mint[NEXT] = fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT),	true	);
+	NEXT = E_Settings::WINDOW_IS_MINIMISED;		HotMap_mint[NEXT] = fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT),	false	);
+	NEXT = E_Settings::WINDOW_IS_MAXIMISED;		HotMap_mint[NEXT] = fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT),	false	);
+	NEXT = E_Settings::WINDOW_IS_ALWAYS_ON_TOP;	HotMap_mint[NEXT] = fw::Config::GetSetting_mint	(GetSettingsPrefix(NEXT), ToString(NEXT),	false	);
 
 	return true;
 }

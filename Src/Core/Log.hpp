@@ -141,10 +141,9 @@ namespace ENGINE::Log
 #define FAILURE_msg "PAIN IN MY ASSHOLES"
 #define FAREWELL_msg "Good Hunting S.t.a.l.k.e.r"
 
-#define TIMER_START spdlog::stopwatch sw
-#define TIMER_ELAPSEDc(TimerName, ...) ENGINE::Log::GetLogger(TimerName)->trace(__VA_ARGS__, sw) // Usage: TIMER_ELAPSEDc("Taken {:.3) seconds so far!)
-
-#define TIMER_ELAPSED(logger_name, ...) ENGINE::Log::A_LIFE_Log::GetLogger(logger_name)->trace(__VA_ARGS__, sw) // Usage: TIMER_ELAPSEDc("Taken {:.3) seconds so far!)
+#define TIMER_START spdlog::stopwatch APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE
+#define TIMER_ELAPSEDc(TimerName, ...) ENGINE::Log::GetLogger(TimerName)->trace(__VA_ARGS__, APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE) // Usage: TIMER_ELAPSEDc("Taken {:.3} seconds so far!)
+#define TIMER_ELAPSED(logger_name, ...) ENGINE::Log::GetLogger(logger_name)->trace(__VA_ARGS__, APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE) // Usage: TIMER_ELAPSEDc("Taken {:.3} seconds so far!)
 
 
 /*
@@ -177,7 +176,7 @@ inline int LINK_TEST_Logger()
 
 namespace ENGINE::Log
 {
-    inline static int LowestAllowedLevel = 1;
+    inline static int LowestAllowedLevel = 0;
 
     std::shared_ptr<spdlog::logger> Init_Log()
     {
@@ -277,7 +276,9 @@ namespace ENGINE::Log
 
         switch (NewLevel)
         {
+        case 0:
         case 1:
+            spdlog::set_level(spdlog::level::level_enum(0));
         case 2:
         case 3:
         case 4:

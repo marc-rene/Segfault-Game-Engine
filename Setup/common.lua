@@ -19,7 +19,7 @@ function UseCommonIncludeDirs()
     }
 
     filter "system:windows"
-        links { "dxgi", "d3d12" }
+        links { "dxgi", "d3d12", "d3d11" }
     filter {}
 
 end
