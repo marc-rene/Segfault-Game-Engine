@@ -3,32 +3,10 @@
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_timer.h"
 #include "SDL3/SDL_keyboard.h"
+#include "SDL3/SDL_mouse.h"
 
+#include "DirectXMath.h"
 #include "../Resources/EngineSettings.hpp"
-
-#define WINDOW_MANAGER_NAME "ENGINE::WindowManager"
-
-
-namespace ENGINE::Settings
-{
-	struct WindowSettings : public PrimativeSettings
-	{
-		std::string DefaultWindowTitle = "HAVE WE SEGFAULTED YET?";
-
-
-		SDL_WindowFlags SDLFlag_windowProperties = SDL_WINDOW_RESIZABLE;
-		int int_preferredWindowWidth = 1280;
-		int int_preferredWindowHeight = 720;
-
-		bool SetSettingsFromConfig() override
-		{
-			int_preferredWindowWidth = ENGINE::Platform::FileIO::Config::GetSetting_int("Window", "Width");
-			int_preferredWindowHeight = ENGINE::Platform::FileIO::Config::GetSetting_int("Window", "Height");
-
-			return true;
-		}
-	};
-}
 
 
 namespace ENGINE::Platform
@@ -38,20 +16,57 @@ namespace ENGINE::Platform
 	public:
 
 		bool Initialise();
-		SDL_Window* CreateMainWindow(ENGINE::Settings::WindowSettings* p_windowProperties, bool p_Force = false);
+		SDL_Window* CreateMainWindow(bool p_Force = false);
 		SDL_Window* GetMainWindowRef();
+
+		static mint PollEvents();
 
 		std::string* GetWindowTitle()
 		{
-			return &m_windowSettings.DefaultWindowTitle;
+			namespace S = ENGINE::Settings;
+			return S::ActiveSettings::GetSetting_str(S::E_Settings::WINDOW_TITLE);
 		}
 
-		WindowManager();
+		WindowManager(const WindowManager& obj) = delete;
+
+		inline static WindowManager* GetInstance()
+		{
+			if (self_reference == nullptr) {
+				std::lock_guard<std::mutex> lock(mtx);
+				if (self_reference == nullptr) {
+					self_reference = new WindowManager();
+				}
+			}
+			return self_reference;
+		}
+
+		inline static const DirectX::XMFLOAT2* GetMouseWindowPosition()
+		{
+			return &ENGINE::Platform::WindowManager::GetInstance()->Mouse_pos;
+		}
+
+		inline static const float* GetMouseWindowPosition_X()
+		{
+			return &ENGINE::Platform::WindowManager::GetInstance()->Mouse_pos.x;
+		}
+
+		inline static const float* GetMouseWindowPosition_Y()
+		{
+			return &ENGINE::Platform::WindowManager::GetInstance()->Mouse_pos.y;
+		}
 
 	private:
+		DirectX::XMFLOAT2 Mouse_pos = DirectX::XMFLOAT2(0.0f, 0.0f);
+
 		bool b_isInitialised = false;
 		inline static SDL_Window* m_MainSDLWindow;
-		ENGINE::Settings::WindowSettings m_windowSettings;
+		inline static WindowManager* self_reference;
+		inline static std::mutex mtx;
+		
+		WindowManager() 
+		{
+			Initialise();
+		};
 
 	};// WindowManager
 }

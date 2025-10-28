@@ -1,20 +1,25 @@
 #include <iostream>
-#include <chrono>
-#include <thread>
-
 
 #include "Apocalypse.hpp"
 
-#include "SDL3/SDL.h"
+
 
 int main()
 {
-	ENGINE::Runtime::ClientRuntime clientRuntime;
-	
-	while (true)
-	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-	}
+    ENGINE::Log::SetLoggerVerbosity(3); // Warnings Only
 
-	return 0;
+    ENGINE::Runtime::ClientRuntime clientRuntime;
+
+
+    while (clientRuntime.IsRunning())
+    {
+        clientRuntime.On_FixedTick_Start();
+
+        clientRuntime.On_FixedTick_End();
+
+        // std::cout << "Fixed Tick Deltatime: " << clientRuntime.GetFixedTickDeltaTimeMicroSeconds() << " us\t==\t" << std::endl;
+    }
+
+    clientRuntime.Shutdown(); // Just incase something else changes clientRuntime.IsRunning()
+    return 0;
 }

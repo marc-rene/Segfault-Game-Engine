@@ -171,7 +171,12 @@ project "Segfault Game Engine"
     
     UseCommonIncludeDirs()
     
-    links { "SDL", "imgui_sdl3_dx12" }
+    links { "SDL", "imgui_sdl3_dx12",
+            -- SDL dependencies
+            "winmm", 
+            "imm32",
+            "version",
+            "setupapi"}
     dependson { "SDL" }
 
 

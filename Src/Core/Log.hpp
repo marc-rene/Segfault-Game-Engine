@@ -27,17 +27,18 @@ namespace ENGINE::Log
 
 }
 
-#define TRACEc(...)                                                                                       \
-    {                                                                                                     \
-        try                                                                                               \
-        {                                                                                                 \
-            ENGINE::Log::GetLogger()->trace(__VA_ARGS__);                                                    \
-        }                                                                                                 \
-        catch (const std::exception &e)                                                                   \
-        {                                                                                                 \
-            std::cout << std::format("\n! Trace log error: {}!\n", e.what()) << std::format(__VA_ARGS__); \
-        }                                                                                                 \
+#define TRACEc(...)                                                                                         \
+    {                                                                                                       \
+        try                                                                                                 \
+        {                                                                                                   \
+            ENGINE::Log::GetLogger()->trace(__VA_ARGS__);                                                   \
+        }                                                                                                   \
+        catch (const std::exception &e)                                                                     \
+        {                                                                                                   \
+            std::cout << std::format("\n! Trace log error: {}!\n", e.what()) << std::format(__VA_ARGS__);   \
+        }                                                                                                   \
     }
+
 #define TRACE(logger_name, ...)                                                                          \
     {                                                                                                    \
         try                                                                                              \
@@ -176,6 +177,8 @@ inline int LINK_TEST_Logger()
 
 namespace ENGINE::Log
 {
+    inline static int LowestAllowedLevel = 1;
+
     std::shared_ptr<spdlog::logger> Init_Log()
     {
         return Init_Log(ENGINE_NAME);
@@ -217,6 +220,7 @@ namespace ENGINE::Log
             static auto frontEndConsoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
             frontEndConsoleSink->set_pattern("-> [%H:%M %Ss]  %n: \t%^[%l]\t %v%$"); // -> [15:42 59s] [File Wizard] [info]    Hello :)
+            frontEndConsoleSink->set_level(spdlog::level::level_enum(LowestAllowedLevel));
 
             static std::string filename = std::format("{}/logs/{} {}.log", std::filesystem::current_path().string(), ENGINE_NAME, formatted_date);
             static auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
@@ -229,9 +233,8 @@ namespace ENGINE::Log
             //if (total_inits == 0)
             //    spdlog::init_thread_pool(8192, 1);
             //auto logger =       std::make_shared<spdlog::async_logger>(LoggerName, sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-
             auto logger = std::make_shared<spdlog::logger>(LoggerName, sinks.begin(), sinks.end());
-            logger->set_level(spdlog::level::SPDLOG_LEVEL); // or info/warn
+            logger->set_level(spdlog::level::level_enum(LowestAllowedLevel)); // or info/warn
             spdlog::register_logger(logger);
 
             return logger;
@@ -264,4 +267,31 @@ namespace ENGINE::Log
 
         return spdlog::get(LoggerName);
     }
+
+
+    /// @brief What verbosity do we want to update all our logs to?
+    /// @param NewLevel 1: Debugging / Trace, 2: General Info, 3: Warnings, 4: Errors, 5: APOCALYPSE
+    /// @return True if success
+    inline static bool SetLoggerVerbosity(int NewLevel)
+    {
+
+        switch (NewLevel)
+        {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            spdlog::set_level(spdlog::level::level_enum(NewLevel));
+            break;
+        default:
+            WARNc("Hey, {} isn't a valid log level, it's between 0 (debug+trace) -> 4 (CRITICAL)", NewLevel);
+            return false;
+        }
+
+        LowestAllowedLevel = NewLevel;
+        return true;
+    }
+
+
 }
