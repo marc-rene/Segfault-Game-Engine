@@ -4,7 +4,9 @@
 #include "SDL3/SDL_timer.h"
 #include "SDL3/SDL_keyboard.h"
 #include "SDL3/SDL_mouse.h"
+#include "SDL3/SDL_properties.h"
 
+#include <Windows.h>
 #include "DirectXMath.h"
 #include "../Resources/EngineSettings.hpp"
 
@@ -18,8 +20,18 @@ namespace ENGINE::Platform
 		bool Initialise();
 		SDL_Window* CreateMainWindow(bool p_Force = false);
 		SDL_Window* GetMainWindowRef();
+		HWND GetMainWindowHWND();
 
 		static mint PollEvents();
+
+		//HWND GetWindowHandle_Windows()
+
+		bool UpdateTitle();
+
+
+		bool SetWindowTitle(std::string new_title, bool UpdateActiveWindowTitleToo = false);
+
+
 
 		std::string* GetWindowTitle()
 		{

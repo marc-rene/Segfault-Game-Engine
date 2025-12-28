@@ -1,5 +1,7 @@
 #include "Window.hpp"
 
+#include "../Utilities/Editor.hpp"
+
 constexpr const char* WINDOW_MANAGER_NAME = "ENGINE::Platform::WindowManager";
 
 
@@ -113,6 +115,9 @@ SDL_Window* ENGINE::Platform::WindowManager::CreateMainWindow(bool p_Force)
             \"HEY! I CAN'T BE SMALLER THAN {} x {}... WTF??? WORDS CANNOT DESCRIBE MY CONFUSION!\"",
             settingsInt_ptr->at(S::E_Settings::WINDOW_MINIMUM_WIDTH), settingsInt_ptr->at(S::E_Settings::WINDOW_MINIMUM_HEIGHT));
     }
+
+
+
     return m_MainSDLWindow;
 }
 
@@ -123,6 +128,20 @@ SDL_Window* ENGINE::Platform::WindowManager::GetMainWindowRef()
     return ENGINE::Platform::WindowManager::m_MainSDLWindow;
 }
 
+HWND ENGINE::Platform::WindowManager::GetMainWindowHWND()
+{
+    SDL_PropertiesID props = SDL_GetWindowProperties(m_MainSDLWindow);
+    auto hwnd_ptr = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+    HWND hwnd = (HWND)hwnd_ptr; // This works???
+    // Not sure whether it sets any errors when returning a default value, so this may be redundant
+
+    if (!hwnd) {
+        ERROR(WINDOW_MANAGER_NAME, "Failed to get HWND: {}", SDL_GetError());
+    }
+
+    return hwnd;
+}
+
 
 
 mint ENGINE::Platform::WindowManager::PollEvents()
@@ -130,9 +149,15 @@ mint ENGINE::Platform::WindowManager::PollEvents()
     if (GetInstance()->b_isInitialised == false)
         ERROR(WINDOW_MANAGER_NAME, "How is a unInitialised Window supposed to get any events?");
 
+
+    std::lock_guard<std::mutex> lock(mtx);
     SDL_Event event;
-        
+    
     while (SDL_PollEvent(&event)) {
+        
+        if (ENGINE::Editor::Is_Initialised() == true)
+            ENGINE::Editor::GetInstance()->ProcessSDLEvent(&event);
+        
         if (event.type == SDL_EVENT_QUIT) {
             return 0;
         }
@@ -170,13 +195,46 @@ mint ENGINE::Platform::WindowManager::PollEvents()
             //INFO(WINDOW_MANAGER_NAME, "OI BLYAT MOUSE GO BRRRRR!!!");
         }
 
+        if (event.type == SDL_EVENT_WINDOW_RESIZED)
+        {
+            INFO(WINDOW_MANAGER_NAME, "Window's been resized! Gotta readjust!");
+            return 1;
+
+        }
+
         else
         {
             //TRACE(WINDOW_MANAGER_NAME, "OI EVENT WAS CALLED: {}", event.type);
         }
     }
 
+    mtx.unlock();
     return 1;
+}
+
+bool ENGINE::Platform::WindowManager::UpdateTitle()
+{
+    namespace S = ENGINE::Settings;
+    return SDL_SetWindowTitle(
+        GetMainWindowRef(), S::ActiveSettings::GetSetting_str(S::E_Settings::WINDOW_TITLE)->c_str()
+    );
+}
+
+bool ENGINE::Platform::WindowManager::SetWindowTitle(std::string new_title, bool UpdateActiveWindowTitleToo)
+{
+    namespace S = ENGINE::Settings;
+
+    //TRACE(WINDOW_MANAGER_NAME, "Changing Title Name to {}", new_title);
+    if (S::ActiveSettings::SetSetting_str(S::E_Settings::WINDOW_TITLE, new_title))
+    {
+        if (UpdateActiveWindowTitleToo)
+            return UpdateTitle();
+
+        else
+            return true;
+    }
+    return false;
+
 }
 
 

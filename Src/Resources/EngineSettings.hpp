@@ -4,6 +4,7 @@
 #include <mutex>
 #include "TypeDefinitions.hpp"
 #include "../Platform/File Wizard.hpp"
+#include <map>
 
 
 // !!! REMEMBER !!!
@@ -27,6 +28,7 @@ X(WINDOW_IS_RESIZABLE)		    \
 X(WINDOW_IS_MINIMISED)		    \
 X(WINDOW_IS_MAXIMISED)			\
 X(WINDOW_IS_ALWAYS_ON_TOP)		\
+X(VIDEO_ENABLE_VSYNC)			\
 
 
 namespace ENGINE::Settings
@@ -66,10 +68,10 @@ namespace ENGINE::Settings
 		static std::string* GetSetting_str	(E_Settings SettingID) { return &GetStringConfigVars()->at(SettingID); };
 		
 	
-		inline static bool	SetSetting_mint(E_Settings SettingID, mint NewValue)		{ GetMintConfigVars()->at(SettingID) = NewValue; UpdateConfig(); }
-		inline static bool	SetSetting_int(E_Settings SettingID, int NewValue)			{ GetIntConfigVars()->at(SettingID) = NewValue; UpdateConfig(); }
-		inline static bool	SetSetting_float(E_Settings SettingID, float NewValue)		{ GetFloatConfigVars()->at(SettingID) = NewValue; UpdateConfig(); }
-		inline static bool	SetSetting_str(E_Settings SettingID, std::string NewValue)	{ GetStringConfigVars()->at(SettingID) = NewValue; UpdateConfig(); }
+		inline static bool	SetSetting_mint(E_Settings SettingID, mint NewValue)		{ GetMintConfigVars()->at(SettingID) = NewValue;	return UpdateConfig(1); }
+		inline static bool	SetSetting_int(E_Settings SettingID, int NewValue)			{ GetIntConfigVars()->at(SettingID) = NewValue;		return UpdateConfig(2); }
+		inline static bool	SetSetting_float(E_Settings SettingID, float NewValue)		{ GetFloatConfigVars()->at(SettingID) = NewValue;	return UpdateConfig(3); }
+		inline static bool	SetSetting_str(E_Settings SettingID, std::string NewValue)	{ GetStringConfigVars()->at(SettingID) = NewValue;	return UpdateConfig(4); }
 
 
 		inline static std::map<E_Settings, mint>* GetMintConfigVars() { return &HotMap_mint; }
@@ -80,7 +82,7 @@ namespace ENGINE::Settings
 		static bool Initialise();
 
 	private:
-		static void UpdateConfig(); // Update our config file based on our new hotmap
+		static bool UpdateConfig(mint); // Update our config file based on our new hotmap
 		static constexpr const std::string GetSettingsPrefix(E_Settings SettingID);
 
 		inline static std::map<E_Settings, mint>		HotMap_mint; // Bool Settings we'll be getting alot of at Runtime

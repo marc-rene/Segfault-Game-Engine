@@ -31,7 +31,7 @@ Engine_Path = "%{wks.location}/Binaries/%{cfg.architecture}/%{cfg.buildcfg}/Segf
 function UseApocalypseEngine()
     -- Link against the static lib
     links { Engine_Path }
-    dependson { "Segfault Game Engine", "imgui_sdl3_dx12", "SDL" }
+    dependson { "Segfault Game Engine", "imgui_sdl3_d3d", "SDL" }
 end
 
 

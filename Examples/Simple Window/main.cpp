@@ -1,4 +1,6 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #include "Apocalypse.hpp"
 
@@ -6,20 +8,44 @@
 
 int main()
 {
-    //ENGINE::Log::SetLoggerVerbosity(3); // Warnings Only
-
     ENGINE::Runtime::ClientRuntime clientRuntime;
+    std::string NewTitle;
 
+    clientRuntime.On_First_Ever_Frame();
+
+    uMint counter = 0;
+
+    //clientRuntime.EnableEditor();
+
+    std::thread FixTickThread(&ENGINE::Runtime::ClientRuntime::On_FixedTick, &clientRuntime);
+    
+    if (FixTickThread.joinable())
+    {
+        INFOc("Trying to make the Fix Tick Thread Detach!");
+        FixTickThread.detach();
+    }
 
     while (clientRuntime.IsRunning())
     {
-        clientRuntime.On_FixedTick_Start();
+        auto startTime = std::chrono::high_resolution_clock::now();
+        
+        clientRuntime.On_Frame_Start();
+        
 
-        clientRuntime.On_FixedTick_End();
+        //ENGINE::Editor::Windows::FPS_Counter();
 
-        // std::cout << "Fixed Tick Deltatime: " << clientRuntime.GetFixedTickDeltaTimeMicroSeconds() << " us\t==\t" << std::endl;
+        clientRuntime.On_Frame_End();
+        
+
+        if (counter == 0)
+        {
+            NewTitle = std::format("FPS: {}    {} us between frames", 1000000.0f / clientRuntime.GetFixedTickDeltaTimeMicroSeconds_Average(), clientRuntime.GetFixedTickDeltaTimeMicroSeconds_Average());
+            ENGINE::Platform::WindowManager::GetInstance()->SetWindowTitle(NewTitle, true);
+        }
+        counter++;
     }
+    FixTickThread.join();
 
-    // clientRuntime.Shutdown(); // All cleanup handled by deconstructors
+    clientRuntime.Shutdown(); // Just incase something else changes clientRuntime.IsRunning()
     return 0;
 }

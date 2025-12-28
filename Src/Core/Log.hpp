@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <memory>
+
+#if DISTRUBTION == 0
+
 #include "spdlog/spdlog.h"
 #include "spdlog/stopwatch.h"
 #include "spdlog/sinks/callback_sink.h"
@@ -9,14 +12,35 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/async.h"
 
+#endif
+
 #include <filesystem>
 
 #define log_errorLogName "TOMFOOLERY"
 #define SPDLOG_LEVEL trace
 
+
+
+#if DISTRUBTION == 1
+#define TRACEc(...) 
+#define TRACE(...) 
+#define INFOc(...) 
+#define INFO(...) 
+#define WARNc(...) 
+#define WARN(...) 
+#define OhSHITc(...) 
+#define OhSHIT(...) 
+#define CRITICAL(...) 
+
+#define TIMER_START(...)
+#define TIMER_ELAPSEDc(...)
+#define TIMER_ELAPSED(...)
+#else
+
+
+
 namespace ENGINE::Log
 {
-
     static std::shared_ptr<spdlog::logger> Init_Log();
     static std::shared_ptr<spdlog::logger> Init_Err_Log();
     static std::shared_ptr<spdlog::logger> Init_Log(const char* LoggerName);
@@ -24,8 +48,8 @@ namespace ENGINE::Log
     static std::shared_ptr<spdlog::logger> GetLogger();
     static std::shared_ptr<spdlog::logger> GetLogger(std::string LoggerName);
     static std::shared_ptr<spdlog::logger> GetLogger(const char* LoggerName);
-
 }
+
 
 #define TRACEc(...)                                                                                         \
     {                                                                                                       \
@@ -136,14 +160,17 @@ namespace ENGINE::Log
         }                                                                                                                             \
     }
 
+#define TIMER_START spdlog::stopwatch APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE
+#define TIMER_ELAPSEDc(TimerName, ...) ENGINE::Log::GetLogger(TimerName)->trace(__VA_ARGS__, APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE) // Usage: TIMER_ELAPSEDc("Taken {:.3} seconds so far!)
+#define TIMER_ELAPSED(logger_name, ...) ENGINE::Log::GetLogger(logger_name)->trace(__VA_ARGS__, APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE) // Usage: TIMER_ELAPSEDc("Taken {:.3} seconds so far!)
+
+#endif // If NOT distrubtion build
+
 #define SUCCESS_msg "GREAT SUCESS"
 #define WARNING_msg "Oh Wawaweewa..."
 #define FAILURE_msg "PAIN IN MY ASSHOLES"
 #define FAREWELL_msg "Good Hunting S.t.a.l.k.e.r"
 
-#define TIMER_START spdlog::stopwatch APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE
-#define TIMER_ELAPSEDc(TimerName, ...) ENGINE::Log::GetLogger(TimerName)->trace(__VA_ARGS__, APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE) // Usage: TIMER_ELAPSEDc("Taken {:.3} seconds so far!)
-#define TIMER_ELAPSED(logger_name, ...) ENGINE::Log::GetLogger(logger_name)->trace(__VA_ARGS__, APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE) // Usage: TIMER_ELAPSEDc("Taken {:.3} seconds so far!)
 
 
 /*
@@ -159,23 +186,53 @@ I apologise...
 
 
 
-inline int LINK_TEST_Logger()
-{
-    try
-    {
-        spdlog::info("Logger Success!");
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-        return -1;
-    }
 
-    return 43;
-}
 
 namespace ENGINE::Log
 {
+#if DISTRUBTION == 1
+    inline static int LowestAllowedLevel = 0;
+
+    inline static std::shared_ptr<void*> Init_Log()
+    {
+        return nullptr;
+    }
+
+    inline static std::shared_ptr<void*> Init_Err_Log()
+    {
+        return nullptr;
+    }
+
+    inline static std::shared_ptr<void*> Init_Log(const char* LoggerName)
+    {
+        return nullptr;
+    }
+
+    inline static std::shared_ptr<void*> GetLogger()
+    {
+        return nullptr;
+    }
+
+    inline static std::shared_ptr<void*> GetLogger(const std::string LoggerName)
+    {
+        return nullptr;
+    }
+
+    inline static  std::shared_ptr<void*> GetLogger(const char* LoggerName)
+    {
+        return nullptr;
+    }
+
+
+    /// @brief What verbosity do we want to update all our logs to?
+    /// @param NewLevel 1: Debugging / Trace, 2: General Info, 3: Warnings, 4: Errors, 5: APOCALYPSE
+    /// @return True if success
+    inline static bool SetLoggerVerbosity(int NewLevel)
+    {
+        return false;
+    }
+#else
+
     inline static int LowestAllowedLevel = 0;
 
     std::shared_ptr<spdlog::logger> Init_Log()
@@ -293,6 +350,6 @@ namespace ENGINE::Log
         LowestAllowedLevel = NewLevel;
         return true;
     }
-
+#endif
 
 }

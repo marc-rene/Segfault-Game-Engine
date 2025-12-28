@@ -105,7 +105,7 @@ group "ThirdParty"
         SetOutputDirs()
         
     -- ImGui (only DirectX 12 + SDL3)
-    project "imgui_sdl3_dx12"
+    project "imgui_sdl3_d3d"
         kind "StaticLib"
         language "C++"
         cppdialect "C++20"
@@ -114,9 +114,12 @@ group "ThirdParty"
             "%{wks.location}/ThirdParty/ImGui/*.hpp",
             "%{wks.location}/ThirdParty/ImGui/*.c",
             "%{wks.location}/ThirdParty/ImGui/*.cpp",
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_dx11.*",   -- JUST to be sure            
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_dx12.*",   -- JUST to be sure            
-            "%{wks.location}/Rendering/Imgui/backends/imgui_impl_sdl3.*",   -- JUST to be sure
+            
+            "%{wks.location}/ThirdParty/ImGui/backends/**",       
+            "!%{wks.location}/ThirdParty/ImGui/sdlgpu3/*",
+            "!%{wks.location}/ThirdParty/ImGui/vulkan/*",
+            
+
         }
         
         includedirs {
@@ -125,12 +128,28 @@ group "ThirdParty"
         }
         
         removefiles  {
-            "%{wks.location}/Rendering/Imgui/examples/**",
-            
-            "!%{wks.location}/Rendering/Imgui/backends/imgui_impl_dx11.*",
-            "!%{wks.location}/Rendering/Imgui/backends/imgui_impl_dx12.*",
-            "!%{wks.location}/Rendering/Imgui/backends/imgui_impl_sdl3.*",
-            "%{wks.location}/Rendering/Imgui/backends/**",
+            "%{wks.location}/ThirdParty/ImGui/examples/**",
+            "%{wks.location}/ThirdParty/ImGui/sdlgpu3/*",
+            "%{wks.location}/ThirdParty/ImGui/vulkan/*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_allegro5.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_android.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_dx10.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_dx9.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_glfw.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_glut.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_metal.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_opengl2.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_opengl3.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_opengl3_loader.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_osx.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_sdl2.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_sdlgpu3.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_sdlgpu3_shaders.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_sdlrenderer2.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_sdlrenderer3.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_vulkan.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_wgpu.*",
+            "%{wks.location}/ThirdParty/ImGui/backends/imgui_impl_win32.*",
         }
 
         SetOutputDirs()
@@ -171,12 +190,14 @@ project "Segfault Game Engine"
     
     UseCommonIncludeDirs()
     
-    links { "SDL", "imgui_sdl3_dx12",
-            -- SDL dependencies
-            "winmm", 
-            "imm32",
-            "version",
-            "setupapi"}
+    links { "SDL", 
+        "imgui_sdl3_d3d",
+        -- SDL dependencies
+        "winmm", 
+        "imm32",
+        "version",
+        "setupapi"
+    }
     dependson { "SDL" }
 
 
