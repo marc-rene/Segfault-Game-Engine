@@ -56,15 +56,14 @@ flowchart TD
 ### DaVinci Renderer Module
 ```mermaid
 flowchart TD
-    Davinci[DaVinci]    -- Window Management    --> sdl[SDL3]
-    Davinci --  Memory Allocation Helper        --> DMA[DirectX 12 Memory Allocator]
-    Davinci --  D3D12 Helper                    --> DTK[DirectX 12 Toolkit]
-    Davinci --  D3D12 Device Management         --> dxgi[DirectX Graphics Infrastructure]
-    Davinci --  Viewport Debug Editor           --> nitpick[NitPick - ImGui Editor ]
+    sdl[SDL3]                           -- Window Management    -->    Davinci[DaVinci Module]    
+    DMA[DirectX 12 Memory Allocator]    --  Memory Allocation Helper    --> Davinci
+    DTK[DirectX 12 Toolkit]             --  D3D12 Helper    --> Davinci
+    dxgi[DirectX Graphics Infrastructure]   --  D3D12 Device Management --> Davinci
+    
+    Davinci --  Viewport Debug Editor --> nitpick[NitPick - ImGui Editor ]
         
-    sdl --> ApocalypseRuntime
-    DMA --> ApocalypseRuntime
-    DTK --> ApocalypseRuntime
-    dxgi --> ApocalypseRuntime
+    Davinci --> ApocalypseRuntime[Apocalypse Runtime]
     nitpick --> ApocalypseRuntime
+
 ```
