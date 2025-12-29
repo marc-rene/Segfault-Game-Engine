@@ -3,7 +3,6 @@ local M = {}
 function UseCommonIncludeDirs()
     includedirs {
         "%{wks.location}/Include",
-        
         "%{wks.location}/ThirdParty/DirectX_12_Memory_Allocator/include",
         "%{wks.location}/ThirdParty/DirectX_12_Toolkit/Inc",
         "%{wks.location}/ThirdParty/DirectX_Math/Inc",

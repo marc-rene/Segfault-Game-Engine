@@ -1,7 +1,7 @@
 #pragma once
 
 #include <chrono>
-#include "TypeDefinitions.hpp"
+#include "../Core/TypeDefinitions.hpp"
 #include "../Core/Log.hpp"
 #include "../Platform/File Wizard.hpp"
 #include "../Platform/Window.hpp"

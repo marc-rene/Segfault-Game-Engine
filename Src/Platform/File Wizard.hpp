@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TypeDefinitions.hpp"
+#include "../Core/TypeDefinitions.hpp"
 #include "../Core/Log.hpp"
 #include "ini.h"
 #include <filesystem>

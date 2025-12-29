@@ -8,7 +8,7 @@
 
 #include <Windows.h>
 #include "DirectXMath.h"
-#include "../Base/BaseModule.hpp"
+#include "../Core/BaseModule.hpp"
 #include "../Resources/EngineSettings.hpp"
 
 /*

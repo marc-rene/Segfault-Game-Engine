@@ -2,7 +2,7 @@
 
 #include "../Core/Log.hpp"
 #include <mutex>
-#include "TypeDefinitions.hpp"
+#include "../Core/TypeDefinitions.hpp"
 #include "../Platform/File Wizard.hpp"
 #include <map>
 
