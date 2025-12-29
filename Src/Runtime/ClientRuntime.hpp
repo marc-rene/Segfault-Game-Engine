@@ -64,7 +64,6 @@ namespace ENGINE::Runtime
 
             auto windowManager_ref = ENGINE::Platform::WindowManager::GetInstance();
             windowManager_ref->CreateMainWindow();
-
         }
 
         inline static const long long GetFixedTickDeltaTimeMicroSeconds()

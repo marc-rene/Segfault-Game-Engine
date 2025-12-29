@@ -212,7 +212,7 @@ mint ENGINE::Platform::WindowManager::PollEvents()
     return 1;
 }
 
-bool ENGINE::Platform::WindowManager::UpdateTitle()
+bool ENGINE::Platform::WindowManager::RefreshWindowTitle()
 {
     namespace S = ENGINE::Settings;
     return SDL_SetWindowTitle(
@@ -228,7 +228,7 @@ bool ENGINE::Platform::WindowManager::SetWindowTitle(std::string new_title, bool
     if (S::ActiveSettings::SetSetting_str(S::E_Settings::WINDOW_TITLE, new_title))
     {
         if (UpdateActiveWindowTitleToo)
-            return UpdateTitle();
+            return RefreshWindowTitle();
 
         else
             return true;

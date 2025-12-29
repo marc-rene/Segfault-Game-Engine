@@ -3,9 +3,9 @@
 #include "TypeDefinitions.hpp"
 #include "../Core/Log.hpp"
 
-#define DIRECTX11 1
-
+#define DIRECTX11 0
 #define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 #if DIRECTX11
 #include <d3d11_1.h>       
@@ -13,8 +13,8 @@
 #include <d3d12.h>       
 #endif
 
-#include <dxgi.h>        // DirectX driver interface
-#include <d3dcompiler.h> // shader compiler
+#include <dxgi1_6.h>        // DirectX driver interface
+#include <d3dcompiler.h>    // shader compiler
 #pragma comment(lib, "d3dcompiler.lib")
 
 #include <iostream>
@@ -80,9 +80,18 @@ namespace ENGINE::Rendering
         long DefineInputLayout(ID3DBlob* vsBlob);
         long CompilePixelShaderFromFile(std::string ShaderFileName);
 
-        ID3D11Device1* GetDirectxDevice() const {
+
+#if DIRECTX11
+        ID3D11Device1* GetDirectxDevice() const
+        {
             return device_ptr;
         }
+#else
+        ID3D12Device1* GetDirectxDevice() const 
+        {
+            return device_ptr;
+        }
+#endif
 
         inline static RenderMaster* GetInstance()
         {
@@ -123,6 +132,7 @@ namespace ENGINE::Rendering
         }
 
 
+#if DIRECTX11
         ID3D11Device1* device_ptr;
         ID3D11DeviceContext1* device_context_ptr;
         IDXGISwapChain1* swap_chain_ptr;
@@ -133,8 +143,18 @@ namespace ENGINE::Rendering
         ID3D11PixelShader* PrimaryPixelShader;
         ID3D11InputLayout* PrimaryInputLayout;
         ID3DBlob* VertexShaderBlob;
-
+#else
+        ID3D12Device* device_ptr;
+        IDXGISwapChain* swap_chain_ptr;
+        ID3D11RenderTargetView* render_target_view_ptr;
+        DXGI_SWAP_CHAIN_DESC    swap_chain_descr;
+        ID3D11VertexShader* PrimaryVertexShader;
+        ID3D11Buffer* PrimaryVertexBuffer;
+        ID3D11PixelShader* PrimaryPixelShader;
+        ID3D11InputLayout* PrimaryInputLayout;
+        ID3DBlob* VertexShaderBlob;
     
+#endif
         RenderMaster() {
             device_ptr = NULL;
             device_context_ptr = NULL;

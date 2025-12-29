@@ -22,7 +22,7 @@ bool ENGINE::Rendering::RenderMaster::Initialise()
         UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 
 #if DEBUG
-        //creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+        creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
         HRESULT hResult = D3D11CreateDevice(0, D3D_DRIVER_TYPE_HARDWARE,

@@ -8,77 +8,115 @@
 
 #include <Windows.h>
 #include "DirectXMath.h"
+#include "../Base/BaseModule.hpp"
 #include "../Resources/EngineSettings.hpp"
 
+/*
+namespace ENGINE
+{
+    struct DaVinci : public ENGINE_MODULE_INTERFACE
+    {
+        static DaVinci* Get_Instance()
+        {
+            if (m_self_ptr == nullptr)
+            {
+                creation_mtx.lock();
+                m_self_ptr = new DaVinci();
+            }
+        }
 
+    protected:
+        std::string_view m_module_title = "DaVinci";
+
+        DaVinci()
+        {
+            Info("DaVinci is Initialised! Now we just need to make some DXGI stuff");
+        };
+
+        static std::mutex creation_mtx;
+        static DaVinci* m_self_ptr;
+    };
+}
+*/
+
+
+
+
+
+
+// DEPRECATED - MOVING TO DAVINCI CLASS FOR ALL RENDERING
 namespace ENGINE::Platform
 {
-	class WindowManager
-	{
-	public:
+    class WindowManager
+    {
+    public:
 
-		bool Initialise();
-		SDL_Window* CreateMainWindow(bool p_Force = false);
-		SDL_Window* GetMainWindowRef();
-		HWND GetMainWindowHWND();
+        bool Initialise();
+        SDL_Window* CreateMainWindow(bool p_Force = false);
+        SDL_Window* GetMainWindowRef();
+        HWND GetMainWindowHWND();
 
-		static mint PollEvents();
+        static mint PollEvents();
 
-		//HWND GetWindowHandle_Windows()
+        //HWND GetWindowHandle_Windows()
 
-		bool UpdateTitle();
-
-
-		bool SetWindowTitle(std::string new_title, bool UpdateActiveWindowTitleToo = false);
+        bool RefreshWindowTitle();
 
 
 
-		std::string* GetWindowTitle()
-		{
-			namespace S = ENGINE::Settings;
-			return S::ActiveSettings::GetSetting_str(S::E_Settings::WINDOW_TITLE);
-		}
+        bool SetWindowTitle(std::string new_title, bool UpdateActiveWindowTitleToo = false);
 
-		WindowManager(const WindowManager& obj) = delete;
 
-		inline static WindowManager* GetInstance()
-		{
-			if (self_reference == nullptr) {
-				std::lock_guard<std::mutex> lock(mtx);
-				if (self_reference == nullptr) {
-					self_reference = new WindowManager();
-				}
-			}
-			return self_reference;
-		}
 
-		inline static const DirectX::XMFLOAT2* GetMouseWindowPosition()
-		{
-			return &ENGINE::Platform::WindowManager::GetInstance()->Mouse_pos;
-		}
+        std::string* GetWindowTitle()
+        {
+            namespace S = ENGINE::Settings;
+            return S::ActiveSettings::GetSetting_str(S::E_Settings::WINDOW_TITLE);
+        }
 
-		inline static const float* GetMouseWindowPosition_X()
-		{
-			return &ENGINE::Platform::WindowManager::GetInstance()->Mouse_pos.x;
-		}
+        WindowManager(const WindowManager& obj) = delete;
 
-		inline static const float* GetMouseWindowPosition_Y()
-		{
-			return &ENGINE::Platform::WindowManager::GetInstance()->Mouse_pos.y;
-		}
+        inline static WindowManager* GetInstance()
+        {
+            if (self_reference == nullptr) {
+                std::lock_guard<std::mutex> lock(mtx);
+                if (self_reference == nullptr) {
+                    self_reference = new WindowManager();
+                }
+            }
+            return self_reference;
+        }
 
-	private:
-		DirectX::XMFLOAT2 Mouse_pos = DirectX::XMFLOAT2(0.0f, 0.0f);
+        inline static const DirectX::XMFLOAT2* GetMouseWindowPosition()
+        {
+            return &ENGINE::Platform::WindowManager::GetInstance()->Mouse_pos;
+        }
 
-		bool b_isInitialised = false;
-		inline static SDL_Window* m_MainSDLWindow;
-		inline static WindowManager* self_reference;
-		inline static std::mutex mtx;
-		
-		WindowManager() 
-		{
-			Initialise();
-		};
+        inline static const float* GetMouseWindowPosition_X()
+        {
+            return &ENGINE::Platform::WindowManager::GetInstance()->Mouse_pos.x;
+        }
 
-	};// WindowManager
+        inline static const float* GetMouseWindowPosition_Y()
+        {
+            return &ENGINE::Platform::WindowManager::GetInstance()->Mouse_pos.y;
+        }
+
+    private:
+        DirectX::XMFLOAT2 Mouse_pos = DirectX::XMFLOAT2(0.0f, 0.0f);
+
+        bool b_isInitialised = false;
+        inline static SDL_Window* m_MainSDLWindow;
+        inline static WindowManager* self_reference;
+        inline static std::mutex mtx;
+
+        WindowManager()
+        {
+            Initialise();
+        };
+
+    };// WindowManager
 }
+
+
+
