@@ -1,5 +1,5 @@
 # Segfault-Game-Engine
-A Game Engine using Directx 12 *(D3D12)* and SDL3. 
+A Game Engine using DirectX 12 *(D3D12)* and SDL3. 
 Intended as a learning project. 
 Do **NOT** use this in any real capacity. 
 The name alone should be a clue!
@@ -22,13 +22,49 @@ We will then have our different modules:
 |**Daft Punk**          |manages all Audio functionality            |FMOD, XAudio2                      |
 |**ENTT Wrapper**       |Wrapper for ENTT (ECS)                     |ENTT                               |
 |**EnkiTS Wrapper**     |Wrapper for EnkiTS (Job System)            |EnkiTS                             |
-|**DaVinci**            |Manages both Renderer and Render API       |DXGI, Directx 12, SDL3, D3D12-M.A  |
+|**DaVinci**            |Manages both Renderer and Render API       |DXGI, DirectX 12, SDL3, D3D12-M.A  |
+|**NitPick**            |ImGui based Editor and Debugger            |ImGui                              |
 |**Apocalypse Runtime** |Client Runtime which combines all modules  |  |
 
+### Modules
+
 ```mermaid
-graph TD
-`Type Definitions.hpp`[Round Rect] --> Base Module((Circle))
-A --> C(Round Rect)
-B --> D{Rhombus}
-C --> D
+flowchart TD
+    TypeDefintions[Type Defintions.hpp] --> Toute[Toute - Logging]
+    Toute --> BaseModule[Base Module Class]
+
+    BaseModule --> FileWizard[File Wizard]
+    BaseModule --> PacketNinja[Packet Ninja]
+    BaseModule --> DaftPunk[Daft Punk]
+    BaseModule --> Entt[EnTT Wrapper]
+    BaseModule --> Enkits[EnkiTS Wrapper]
+    BaseModule --> Davinci[DaVinci]
+    
+    FileWizard --> ApocalypseRuntime[Apocalypse Runtime]
+    PacketNinja --> ApocalypseRuntime
+    DaftPunk --> ApocalypseRuntime
+    Entt --> ApocalypseRuntime
+    Enkits --> ApocalypseRuntime
+    Davinci --> ApocalypseRuntime
+       
+    style Toute fill:#f9f,stroke:#333,stroke-width:4px
+    style BaseModule fill:#bbf,stroke:#333,stroke-width:2px
+    style ApocalypseRuntime fill:#abd,stroke:#333,stroke-width:5px
+```
+
+
+### DaVinci Renderer Module
+```mermaid
+flowchart TD
+    Davinci[DaVinci]    -- Window Management    --> sdl[SDL3]
+    Davinci --  Memory Allocation Helper        --> DMA[DirectX 12 Memory Allocator]
+    Davinci --  D3D12 Helper                    --> DTK[DirectX 12 Toolkit]
+    Davinci --  D3D12 Device Management         --> dxgi[DirectX Graphics Infrastructure]
+    Davinci --  Viewport Debug Editor           --> nitpick[NitPick - ImGui Editor ]
+        
+    sdl --> ApocalypseRuntime
+    DMA --> ApocalypseRuntime
+    DTK --> ApocalypseRuntime
+    dxgi --> ApocalypseRuntime
+    nitpick --> ApocalypseRuntime
 ```
