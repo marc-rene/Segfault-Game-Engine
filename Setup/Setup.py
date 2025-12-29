@@ -28,15 +28,21 @@ def findPremakePath() -> bool:
             logging.error(f"WE CAN'T EVEN FIND OUR OWN LOCAL PREMAKE!\n{PREMAKE_PATH.absolute()} isn't legit!\nCÁC")
             return False
 
+
+
 def findEditorPath() -> bool:
     global EDITOR_PATH
     global PROJECT_PATH
     
     logging.debug(f"trying to find Build.lua in {Path(__file__).as_uri()}\nparent-2 is {Path(__file__).parent.parent.as_uri()}")
+    
     PROJECT_PATH = Path(__file__).parent.parent
+    
     luaBuild = PROJECT_PATH / "Build.lua"
+    
     logging.debug(f"Attempting to find lua build at {luaBuild.absolute()}")
     logging.debug(f"Lua build is file: {luaBuild.is_file()}")
+    
     if luaBuild.is_file():
         logging.info(f"Found build file for Editor at {luaBuild.absolute()}")
         EDITOR_PATH = luaBuild
