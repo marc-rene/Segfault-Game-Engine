@@ -66,7 +66,6 @@ filter "configurations:Distrubtion"
         "/fp:fast", 
         "/GS-", 
         "/arch:AVX2"
-    
     }
 
 
