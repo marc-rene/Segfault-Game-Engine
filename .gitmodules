@@ -1,0 +1,27 @@
+[submodule "Engine/ThirdParty/DirectX_12_Memory_Allocator"]
+	path = Engine/ThirdParty/DirectX_12_Memory_Allocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git
+[submodule "Engine/ThirdParty/EnkiTS"]
+	path = Engine/ThirdParty/EnkiTS
+	url = https://github.com/dougbinks/enkiTS.git
+[submodule "Engine/ThirdParty/ImGui"]
+	path = Engine/ThirdParty/ImGui
+	url = https://github.com/ocornut/imgui.git
+[submodule "Engine/ThirdParty/Spdlog"]
+	path = Engine/ThirdParty/Spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "Engine/ThirdParty/DirectX_12_Toolkit"]
+	path = Engine/ThirdParty/DirectX_12_Toolkit
+	url = https://github.com/microsoft/DirectXTK12.git
+[submodule "Engine/ThirdParty/DirectX_Math"]
+	path = Engine/ThirdParty/DirectX_Math
+	url = https://github.com/microsoft/DirectXMath.git
+[submodule "Engine/ThirdParty/Recast_Navigation"]
+	path = Engine/ThirdParty/Recast_Navigation
+	url = https://github.com/recastnavigation/recastnavigation.git
+[submodule "Engine/ThirdParty/Game_Networking_Sockets"]
+	path = Engine/ThirdParty/Game_Networking_Sockets
+	url = https://github.com/ValveSoftware/GameNetworkingSockets.git
+[submodule "Engine/ThirdParty/SDL"]
+	path = Engine/ThirdParty/SDL
+	url = https://github.com/libsdl-org/SDL.git
