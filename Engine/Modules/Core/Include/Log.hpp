@@ -3,7 +3,8 @@
 #include <iostream>
 #include <memory>
 
-#if DISTRUBTION == 0
+#if ENGINE_DIST == 0
+
 
 #include "spdlog/spdlog.h"
 #include "spdlog/stopwatch.h"
@@ -11,6 +12,9 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/async.h"
+
+
+
 
 #endif
 
@@ -21,7 +25,7 @@
 
 
 
-#if DISTRUBTION == 1
+#if ENGINE_DIST == 0
 #define TRACEc(...) 
 #define TRACE(...) 
 #define INFOc(...) 
@@ -190,7 +194,7 @@ I apologise...
 
 namespace ENGINE::Log
 {
-#if DISTRUBTION == 1
+#if DISTRUBTION == 0
     inline static int LowestAllowedLevel = 0;
 
     inline static std::shared_ptr<void*> Init_Log()

@@ -1,5 +1,5 @@
 @echo off
 
 pushd %~dp0
-python Setup.py
+python Setup/Setup.py
 PAUSE
