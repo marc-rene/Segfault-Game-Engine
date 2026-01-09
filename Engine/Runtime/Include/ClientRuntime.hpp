@@ -1,12 +1,12 @@
 #pragma once
 
 #include <chrono>
-#include "../Core/TypeDefinitions.hpp"
-#include "../Core/Log.hpp"
-#include "../Platform/File Wizard.hpp"
-#include "../Platform/Window.hpp"
-#include "../Rendering/Rendering.hpp"
-#include "../Utilities/Editor.hpp"
+#include "TypeDefinitions.hpp"
+#include "Log.hpp"
+#include "../../Platform/Include/File_Wizard.hpp"
+#include "Platform/Window.hpp"
+#include "Rendering/Rendering.hpp"
+
 
 namespace ENGINE::Runtime
 {

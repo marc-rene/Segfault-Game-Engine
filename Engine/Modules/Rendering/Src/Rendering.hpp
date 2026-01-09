@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Core/TypeDefinitions.hpp"
-#include "../Core/Log.hpp"
+#include "TypeDefinitions.hpp"
+#include "Log.hpp"
 
 #define DIRECTX11 0
 #define WIN32_LEAN_AND_MEAN

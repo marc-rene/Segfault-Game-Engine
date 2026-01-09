@@ -10,6 +10,7 @@ project "Apocalypse Runtime"
     
     includedirs 
     {
+        "%{wks.location}/Engine/Modules",
         "%{wks.location}/Engine/Modules/Core/Include",
         "%{wks.location}/Engine/Modules/Audio/Include",
         "%{wks.location}/Engine/Modules/ECS/Include",
@@ -31,12 +32,9 @@ project "Apocalypse Runtime"
     
     targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
     objdir ("%{wks.location}/Lib/Intermediates/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
-
-    dependson { "DaVinci" }
     
     links 
     { 
-        "CORE_ENGINE_MODULE",   "FileWizard",
-        "PacketNinja",          "DaftPunk",
-        "Swarm",    "DaVinci",  "NitPick",
+        "FileWizard",   "PacketNinja",  "DaftPunk",
+        "Swarm",        "DaVinci",      "NitPick",
     } 

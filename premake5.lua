@@ -34,7 +34,6 @@ workspace "Segfault"
         runtime "Debug"
         optimize "Debug"
         symbols "On"
-        sanitize { "Address" }
     
     --  Release Config
 	filter "configurations:Release"
@@ -99,9 +98,6 @@ workspace "Segfault"
 -- All our Modules
 ----------------------------------------
 group "Modules"
- 
-    include "Engine/Modules/Core/Core.lua"
-    
     include "Engine/Modules/Audio/Daft Punk.lua"
     include "Engine/Modules/ECS/Swarm.lua"
     include "Engine/Modules/Networking/Packet Ninja.lua"

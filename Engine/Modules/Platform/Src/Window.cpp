@@ -1,5 +1,5 @@
 #include "Window.hpp"
-
+/*
 #include "../Utilities/Editor.hpp"
 
 constexpr const char* WINDOW_MANAGER_NAME = "ENGINE::Platform::WindowManager";
@@ -238,3 +238,4 @@ bool ENGINE::Platform::WindowManager::SetWindowTitle(std::string new_title, bool
 }
 
 
+*/

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Core/Log.hpp"
+#include "Log.hpp"
 #include <mutex>
-#include "../Core/TypeDefinitions.hpp"
-#include "../Platform/File Wizard.hpp"
+#include "TypeDefinitions.hpp"
+#include "../Include/File_Wizard.hpp"
 #include <map>
 
 

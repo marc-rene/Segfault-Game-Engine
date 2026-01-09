@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Core/TypeDefinitions.hpp"
-#include "../Core/Log.hpp"
-#include "ini.h"
+#include "TypeDefinitions.hpp"
+#include "Log.hpp"
+#include "../Src/ini.h"
 #include <filesystem>
 #include <mutex>
 

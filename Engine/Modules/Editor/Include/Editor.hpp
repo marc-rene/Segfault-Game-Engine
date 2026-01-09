@@ -1,5 +1,6 @@
 #pragma once
 
+/*
 #include "../Platform/Window.hpp"
 #include "../Rendering/Rendering.hpp"
 
@@ -12,6 +13,7 @@
 
 
 
+*/
 namespace ENGINE
 {
     struct Editor
@@ -24,10 +26,10 @@ namespace ENGINE
         void RenderDrawData();
 
 
-        bool ProcessSDLEvent(SDL_Event* event)
-        {
-            return ImGui_ImplSDL3_ProcessEvent(event);
-        }
+        //bool ProcessSDLEvent(SDL_Event* event)
+        //{
+        //    return ImGui_ImplSDL3_ProcessEvent(event);
+        //}
 
 
 
