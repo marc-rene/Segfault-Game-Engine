@@ -27,9 +27,9 @@ def Find_Premake_Path() -> bool:
         logging.warning(f"Premake was NOT found in PATH (shutil.which)\nUsing local instead")
         
         if IS_WINDOWS:
-            PREMAKE_PATH = Path(__file__).parent / "Windows/Binaries/premake5.exe"
+            PREMAKE_PATH = Path(__file__).parent / "Binaries/Windows/premake5.exe"
         else:
-            PREMAKE_PATH = Path(__file__).parent / "Linux/Binaries/premake5"
+            PREMAKE_PATH = Path(__file__).parent / "Binaries/Linux/premake5"
                         
         if PREMAKE_PATH.is_file():
             logging.info(f"Using local Premake at {PREMAKE_PATH.absolute()}")
