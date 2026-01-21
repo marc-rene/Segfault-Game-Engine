@@ -2,6 +2,16 @@ include "./Setup/Common.lua"
 
 workspace "Segfault"
 	configurations { "Debug", "Release", "Dist" }
+    platforms { "Win32", "x64" }
+    
+    filter "platforms:Win32"
+    architecture "x86"
+
+    filter "platforms:x64"
+    architecture "x64"
+
+    filter {}
+
     startproject "Sample Window"
 
     -- For SDL because it only has debug and release:
@@ -12,7 +22,7 @@ workspace "Segfault"
 	language "C++"
 	cppdialect "C++23"
 	staticruntime "Off"
-	
+
 	flags { "MultiProcessorCompile" }
 
 	defines {
