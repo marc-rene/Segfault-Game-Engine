@@ -2,12 +2,13 @@
 #include <chrono>
 #include <thread>
 
-#include "Apocalypse.hpp"
+#include "../../Include/Apocalypse.hpp"
 
 
 
 int main()
 {
+    /*
     ENGINE::Runtime::ClientRuntime clientRuntime;
     std::string NewTitle;
 
@@ -48,4 +49,7 @@ int main()
 
     clientRuntime.Shutdown(); // Just incase something else changes clientRuntime.IsRunning()
     return 0;
+    */
+    
+    return LINKTEST_RuntimeFolder() + LINKTEST_FileWizardFolder() + LINKTEST_NetworkFolder();
 }

@@ -2,6 +2,10 @@
 
 #include "TypeDefinitions.hpp"
 #include "Log.hpp"
+
+int LINKTEST_FileWizardFolder();
+
+/*
 #include "../Src/ini.h"
 #include <filesystem>
 #include <mutex>
@@ -20,7 +24,7 @@ namespace ENGINE::Platform::FileIO
             if (ready == false)
                 initialise();
 
-            mutex_lock config_lock(mut_config_lock);
+            std::lock_guard<std::mutex> config_lock(mut_config_lock);
             bool overwriting = ini_structure.get(Section).has(value);
 
             ini_structure[Section][Key] = value;
@@ -34,7 +38,7 @@ namespace ENGINE::Platform::FileIO
             if (ready == false)
                 initialise();
 
-            mutex_lock config_lock(mut_config_lock);
+            std::lock_guard<std::mutex> config_lock(mut_config_lock);
 
             if (ini_structure.get(Section).has(Key))  // exists?
             {
@@ -153,7 +157,7 @@ namespace ENGINE::Platform::FileIO
 
         inline static void Flush() // Make sure that we dont have the entire Config in memory at all times
         {
-            mutex_lock config_lock(mut_config_lock);
+            std::lock_guard<std::mutex> config_lock(mut_config_lock);
             ini_config_ref->write(ini_structure);
             ini_structure.clear();
             INFOc("Flushing Engine Config to {}", CONFIG_FILE_NAME);
@@ -165,7 +169,7 @@ namespace ENGINE::Platform::FileIO
         {
             bool exists = true;
 
-            mutex_lock config_lock(mut_config_lock);
+            std::lock_guard<std::mutex> config_lock(mut_config_lock);
 
             try {
                 if (std::filesystem::exists(CONFIG_FILE_NAME) == false)
@@ -214,3 +218,4 @@ namespace ENGINE::Platform::FileIO
     };
 };
 
+*/

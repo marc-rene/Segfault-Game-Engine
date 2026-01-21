@@ -1,10 +1,8 @@
 group "Modules"
-    project "Packet Ninja"
-        kind "SharedLib" 
+    project "PacketNinja"
+        kind "StaticLib" 
         language "C++"
         cppdialect "C++23"
-
-        targetname "PacketNinja"
 
         files { "%{prj.location}/**" }
 
@@ -17,4 +15,6 @@ group "Modules"
         targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
         objdir ("%{wks.location}/Lib/Intermediates/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
 
+        dependson { "CoreModule" }
+        
 group ""

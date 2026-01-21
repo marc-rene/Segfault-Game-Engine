@@ -1,6 +1,6 @@
-//#include "Test.hpp"
+#include "../Include/Daft_Punk.hpp"
 
 int LINKTEST_AudioFolder()
 {
-    return 42;
+    return 43;
 }

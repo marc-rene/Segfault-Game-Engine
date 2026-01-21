@@ -97,6 +97,9 @@ workspace "Segfault"
 ----------------------------------------
 -- All our Modules
 ----------------------------------------
+
+include "Engine/Modules/Core/Core.lua"
+
 group "Modules"
     include "Engine/Modules/Audio/Daft Punk.lua"
     include "Engine/Modules/ECS/Swarm.lua"
@@ -132,22 +135,13 @@ group "Examples"
         includedirs 
         {
             "%{wks.location}/Include",
-            "%{wks.location}/Engine/ThirdParty/DirectX_12_Memory_Allocator/include",
-            "%{wks.location}/Engine/ThirdParty/DirectX_12_Toolkit/Inc",
-            "%{wks.location}/Engine/ThirdParty/DirectX_Math/Inc",
-            "%{wks.location}/Engine/ThirdParty/EnkiTS/src",
-            "%{wks.location}/Engine/ThirdParty/Game_Networking_Sockets/include",
-            "%{wks.location}/Engine/ThirdParty/ImGui",
-            "%{wks.location}/Engine/ThirdParty/ImGui/backends",
-            "%{wks.location}/Engine/ThirdParty/Recast_Navigation/Detour/Include",
-            "%{wks.location}/Engine/ThirdParty/Recast_Navigation/Recast/Include",
-            "%{wks.location}/Engine/ThirdParty/Recast_Navigation/DebugUtils/Include",
-            "%{wks.location}/Engine/ThirdParty/SDL/include",
-            "%{wks.location}/Engine/ThirdParty/Spdlog/include",
+            "%{wks.location}/Engine/Modules/Core/Include",
+            "%{wks.location}/Engine/Modules/Platform/Include",
+            "%{wks.location}/Engine/Modules/Rendering/Include",
         }
 
 
-        dependson { "Apocalypse Runtime", "imgui_sdl3_d3d", "SDL" }
+        dependson { "ApocalypseRuntime", "imgui_sdl3_d3d", "SDL" }
         links { "dxgi", "d3d12", "ApocalypseRuntime" }
 
     end)

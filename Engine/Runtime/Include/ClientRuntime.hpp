@@ -3,10 +3,10 @@
 #include <chrono>
 #include "TypeDefinitions.hpp"
 #include "Log.hpp"
-#include "../../Platform/Include/File_Wizard.hpp"
-#include "Platform/Window.hpp"
-#include "Rendering/Rendering.hpp"
+#include "File_Wizard.hpp"
+#include "DaVinci.hpp"
 
+int LINKTEST_RuntimeFolder();
 
 namespace ENGINE::Runtime
 {
@@ -50,7 +50,8 @@ namespace ENGINE::Runtime
 
         bool EnableEditor()
         {
-            return ENGINE::Editor::GetInstance()->Is_Initialised();
+            false;
+            //return ENGINE::Editor::GetInstance()->Is_Initialised();
         }
 
         ClientRuntime()
@@ -60,10 +61,10 @@ namespace ENGINE::Runtime
             KeepRunning = true;
             ENGINE::Log::Init_Log();
             ENGINE::Log::Init_Err_Log();
-            ENGINE::Settings::ActiveSettings::Initialise();
+            //ENGINE::Settings::ActiveSettings::Initialise();
 
-            auto windowManager_ref = ENGINE::Platform::WindowManager::GetInstance();
-            windowManager_ref->CreateMainWindow();
+            //auto windowManager_ref = ENGINE::Platform::WindowManager::GetInstance();
+            //windowManager_ref->CreateMainWindow();
         }
 
         inline static const long long GetFixedTickDeltaTimeMicroSeconds()
@@ -92,7 +93,7 @@ namespace ENGINE::Runtime
 
         ~ClientRuntime()
         {
-            ENGINE::Platform::FileIO::Config::Flush();
+            //ENGINE::Platform::FileIO::Config::Flush();
         }
         
 

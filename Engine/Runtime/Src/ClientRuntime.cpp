@@ -1,6 +1,12 @@
 #include "../Include/ClientRuntime.hpp"
 
+int LINKTEST_RuntimeFolder()
+{
+    return 43;
+}
 
+
+/*
 void ENGINE::Runtime::ClientRuntime::On_First_Ever_Frame()
 {
     if (ENGINE::Rendering::RenderMaster::GetInstance()->Initialise() == false) {
@@ -17,8 +23,8 @@ void ENGINE::Runtime::ClientRuntime::On_Frame_Start()
 {
     ENGINE::Rendering::RenderMaster::GetInstance()->On_RenderStart();
 
-    if (ENGINE::Editor::Is_Initialised())
-        ENGINE::Editor::GetInstance()->OnFrameStart();
+    //    if (ENGINE::Editor::Is_Initialised())
+    //    ENGINE::Editor::GetInstance()->OnFrameStart();
 }
 
 void ENGINE::Runtime::ClientRuntime::On_Frame_End()
@@ -34,7 +40,7 @@ void ENGINE::Runtime::ClientRuntime::On_FixedTick_Start()
     // START THE CLOCK 
     FixedTickStartTimestamp = std::chrono::high_resolution_clock::now();
     DT_Mutex.unlock();
-
+    /*
     EventPolling_Mutex.lock();
     switch (ENGINE::Platform::WindowManager::PollEvents())
     {
@@ -47,6 +53,7 @@ void ENGINE::Runtime::ClientRuntime::On_FixedTick_Start()
         break;
     }
     EventPolling_Mutex.unlock();
+    
 }
 
 
@@ -85,3 +92,4 @@ void ENGINE::Runtime::ClientRuntime::On_FixedTick_End()
     FenceValue++;
     DT_Mutex.unlock();
 }
+*/

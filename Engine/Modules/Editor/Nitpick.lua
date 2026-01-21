@@ -1,6 +1,6 @@
 group "Modules"
-    project "Nitpick"
-        kind "SharedLib" 
+    project "NitPick"
+        kind "StaticLib" 
         language "C++"
         cppdialect "C++23"
 
@@ -9,17 +9,13 @@ group "Modules"
         includedirs 
         {
             "%{wks.location}/Engine/Modules/Core/Include",
-            "%{wks.location}/Engine/ThirdParty/DirectX_12_Memory_Allocator/include",
-            "%{wks.location}/Engine/ThirdParty/DirectX_12_Toolkit/Inc",
-            "%{wks.location}/Engine/ThirdParty/DirectX_Math/Inc",
-            "%{wks.location}/Engine/ThirdParty/SDL/include",
+
         }
         
         targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
         objdir ("%{wks.location}/Lib/Intermediates/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
 
-        dependson { "DaVinci", "imgui_sdl3_d3d" }
-        links { "DaVinci", "imgui_sdl3_d3d" } 
+        dependson { "CoreModule", "DaVinci", "imgui_sdl3_d3d" }
         
 group ""
 
@@ -29,10 +25,10 @@ group "ThirdParty"
     project "imgui_sdl3_d3d"
         kind "StaticLib"
         language "C++"
-        cppdialect "C++20"
+        cppdialect "C++23"
 
         files {
-            "%{prj.location}/**",
+            --"%{prj.location}/**",
             
             "%{wks.location}/Engine/ThirdParty/ImGui/backends/imgui_impl_dx11.*",       
             "%{wks.location}/Engine/ThirdParty/ImGui/backends/imgui_impl_dx12.*",       

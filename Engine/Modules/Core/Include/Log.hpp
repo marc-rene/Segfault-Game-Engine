@@ -1,65 +1,65 @@
 #pragma once
 
 #include <iostream>
-#include <memory>
-
-#if ENGINE_DIST == 0
 
 
-#include "spdlog/spdlog.h"
-#include "spdlog/stopwatch.h"
-#include "spdlog/sinks/callback_sink.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/async.h"
+#define DEFAULT_LOG_NAME    "Toute"
+#define ERROR_LOG_NAME      "TOMFOOLERY"
+#define SPDLOG_LEVEL        trace
 
+#define SUCCESS_msg     "GREAT SUCESS"
+#define WARNING_msg     "Oh Wawaweewa..."
+#define FAILURE_msg     "PAIN IN MY ASSHOLES"
+#define FAREWELL_msg    "Good Hunting S.T.A.L.K.E.R"
 
 
 
-#endif
-
-#include <filesystem>
-
-#define log_errorLogName "TOMFOOLERY"
-#define SPDLOG_LEVEL trace
-
-
-
-#if ENGINE_DIST == 0
-#define TRACEc(...) 
-#define TRACE(...) 
-#define INFOc(...) 
-#define INFO(...) 
-#define WARNc(...) 
-#define WARN(...) 
-#define OhSHITc(...) 
-#define OhSHIT(...) 
-#define CRITICAL(...) 
-
-#define TIMER_START(...)
-#define TIMER_ELAPSEDc(...)
-#define TIMER_ELAPSED(...)
-#else
-
-
-
-namespace ENGINE::Log
+namespace ENGINE
 {
-    static std::shared_ptr<spdlog::logger> Init_Log();
-    static std::shared_ptr<spdlog::logger> Init_Err_Log();
-    static std::shared_ptr<spdlog::logger> Init_Log(const char* LoggerName);
+    struct Log
+    {
+        static void Init_Log();
+        static void Init_Log(std::string LoggerName);
+        static void Init_Err_Log();
 
-    static std::shared_ptr<spdlog::logger> GetLogger();
-    static std::shared_ptr<spdlog::logger> GetLogger(std::string LoggerName);
-    static std::shared_ptr<spdlog::logger> GetLogger(const char* LoggerName);
+
+        inline static bool is_first_init() { return first_init; }
+
+
+        /// @brief What verbosity do we want to update all our logs to?
+        /// @param NewLevel 1: Debugging / Trace, 2: General Info, 3: Warnings, 4: Errors, 5: APOCALYPSE
+        /// @return True if success
+        static bool SetLoggerVerbosity(int NewLevel);
+
+
+        template <class... Args>
+        static void Trace(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
+
+        template <class... Args>
+        static void Info(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
+
+        template <class... Args>
+        static void Warn(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
+
+        template <class... Args>
+        static void Error(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
+
+        template <class... Args>
+        static void Critical(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
+
+    private:
+        inline static bool first_init = true;
+        inline static int LowestAllowedLevel = 0;
+    };
 }
+
 
 
 #define TRACEc(...)                                                                                         \
     {                                                                                                       \
         try                                                                                                 \
         {                                                                                                   \
-            ENGINE::Log::GetLogger()->trace(__VA_ARGS__);                                                   \
+            ENGINE::Log::Trace(DEFAULT_LOG_NAME, __VA_ARGS__);                                              \
         }                                                                                                   \
         catch (const std::exception &e)                                                                     \
         {                                                                                                   \
@@ -67,23 +67,23 @@ namespace ENGINE::Log
         }                                                                                                   \
     }
 
-#define TRACE(logger_name, ...)                                                                          \
-    {                                                                                                    \
-        try                                                                                              \
-        {                                                                                                \
-            ENGINE::Log::GetLogger(logger_name)->trace(__VA_ARGS__);                                        \
-        }                                                                                                \
-        catch (const std::exception &e)                                                                  \
-        {                                                                                                \
-            std::cout << std::format("\n!Trace log error: {}!\n", e.what()) << std::format(__VA_ARGS__); \
-        }                                                                                                \
+#define TRACE(logger_name, ...)                                                                             \
+    {                                                                                                       \
+        try                                                                                                 \
+        {                                                                                                   \
+            ENGINE::Log::Trace(logger_name, __VA_ARGS__);                                                   \
+        }                                                                                                   \
+        catch (const std::exception &e)                                                                     \
+        {                                                                                                   \
+            std::cout << std::format("\n!Trace log error: {}!\n", e.what()) << std::format(__VA_ARGS__);    \
+        }                                                                                                   \
     }
 
 #define INFOc(...)                                                                                          \
     {                                                                                                       \
         try                                                                                                 \
         {                                                                                                   \
-            ENGINE::Log::GetLogger()->info(__VA_ARGS__);                                                       \
+            ENGINE::Log::Info(DEFAULT_LOG_NAME, __VA_ARGS__);                                               \
         }                                                                                                   \
         catch (const std::exception &e)                                                                     \
         {                                                                                                   \
@@ -94,7 +94,7 @@ namespace ENGINE::Log
     {                                                                                                       \
         try                                                                                                 \
         {                                                                                                   \
-            ENGINE::Log::GetLogger(logger_name)->info(__VA_ARGS__);                                            \
+            ENGINE::Log::Info(logger_name, __VA_ARGS__);                                                    \
         }                                                                                                   \
         catch (const std::exception &e)                                                                     \
         {                                                                                                   \
@@ -105,7 +105,7 @@ namespace ENGINE::Log
     {                                                                                                       \
         try                                                                                                 \
         {                                                                                                   \
-            ENGINE::Log::GetLogger()->warn(__VA_ARGS__);                                                       \
+            ENGINE::Log::Warn(DEFAULT_LOG_NAME, __VA_ARGS__);                                               \
         }                                                                                                   \
         catch (const std::exception &e)                                                                     \
         {                                                                                                   \
@@ -116,7 +116,7 @@ namespace ENGINE::Log
     {                                                                                                       \
         try                                                                                                 \
         {                                                                                                   \
-            ENGINE::Log::GetLogger(logger_name)->warn(__VA_ARGS__);                                            \
+            ENGINE::Log::Warn(logger_name, __VA_ARGS__);                                                    \
         }                                                                                                   \
         catch (const std::exception &e)                                                                     \
         {                                                                                                   \
@@ -124,236 +124,42 @@ namespace ENGINE::Log
         }                                                                                                   \
     }
 
-#define OhSHITc(...)                                                                                          \
-    {                                                                                                        \
-        try                                                                                                  \
-        {                                                                                                    \
-            ENGINE::Log::GetLogger(log_errorLogName)->error(__VA_ARGS__);                                       \
-        }                                                                                                    \
-        catch (const std::exception &e)                                                                      \
-        {                                                                                                    \
-            std::cout << std::format("\n!!!FUCK FUCK ERROR: {}!!!\n", e.what()) << std::format(__VA_ARGS__); \
-        }                                                                                                    \
+#define OhSHITc(...)                                                                                        \
+    {                                                                                                       \
+        try                                                                                                 \
+        {                                                                                                   \
+            ENGINE::Log::Error(ERROR_LOG_NAME, __VA_ARGS__);                                                \
+        }                                                                                                   \
+        catch (const std::exception &e)                                                                     \
+        {                                                                                                   \
+            std::cout << std::format("\n!!!FUCK FUCK ERROR: {}!!!\n", e.what()) << std::format(__VA_ARGS__);\
+        }                                                                                                   \
     }
 
 // MACRO Redefinition - TODO: Find cool new memorable name
-#define OhSHIT(logger_name, ...)                                                                              \
-	{                                                                                                        \
-		try                                                                                                  \
-		{                                                                                                    \
-			ENGINE::Log::GetLogger(logger_name)->error(__VA_ARGS__);                                            \
-		}                                                                                                    \
-		catch (const std::exception &e)                                                                      \
-		{                                                                                                    \
-			std::cout << std::format("\n!!!FUCK FUCK ERROR: {}!!!\n", e.what()) << std::format(__VA_ARGS__); \
-		}                                                                                                    \
+#define OhSHIT(logger_name, ...)                                                                            \
+	{                                                                                                       \
+		try                                                                                                 \
+		{                                                                                                   \
+			ENGINE::Log::Error(logger_name, __VA_ARGS__);                                                   \
+		}                                                                                                   \
+		catch (const std::exception &e)                                                                     \
+		{                                                                                                   \
+			std::cout << std::format("\n!!!FUCK FUCK ERROR: {}!!!\n", e.what()) << std::format(__VA_ARGS__);\
+		}                                                                                                   \
 	}
 
 
-#define CRITICAL(...)                                                                                                                 \
-    {                                                                                                                                 \
-        try                                                                                                                           \
-        {                                                                                                                             \
-            ENGINE::Log::GetLogger(log_errorLogName)->critical(__VA_ARGS__);                                                             \
+#define CRITICAL(...)                                                                                               \
+    {                                                                                                               \
+        try                                                                                                         \
+        {                                                                                                           \
+            ENGINE::Log::Critical(ERROR_LOG_NAME, __VA_ARGS__);                                                     \
             std::cerr << std::format("\n!!!CHORNOBYL REACTOR 4\nCHORNOBYL REACTOR 4:") << std::format(__VA_ARGS__); \
             std::cout << std::format("\n!!!CHORNOBYL REACTOR 4\nCHORNOBYL REACTOR 4:") << std::format(__VA_ARGS__); \
-        }                                                                                                                             \
-        catch (const std::exception &e)                                                                                                \
-        {                                                                                                                             \
-            std::cout << std::format("\n!!!THINGS ARE SO BAD WE CANT EVEN SAY OUR CRITICAL BECAUSE: {}!!!\n", e.what());              \
-        }                                                                                                                             \
+        }                                                                                                           \
+        catch (const std::exception &e)                                                                             \
+        {                                                                                                           \
+            std::cout << std::format("\n!!!THINGS ARE SO BAD WE CANT EVEN SAY OUR CRITICAL BECAUSE: {}!!!\n", e.what());\
+        }                                                                                                           \
     }
-
-#define TIMER_START spdlog::stopwatch APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE
-#define TIMER_ELAPSEDc(TimerName, ...) ENGINE::Log::GetLogger(TimerName)->trace(__VA_ARGS__, APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE) // Usage: TIMER_ELAPSEDc("Taken {:.3} seconds so far!)
-#define TIMER_ELAPSED(logger_name, ...) ENGINE::Log::GetLogger(logger_name)->trace(__VA_ARGS__, APOCALYPSE_ENGINE_LOGGER_LOCAL_STOPWATCH_INSTANCE) // Usage: TIMER_ELAPSEDc("Taken {:.3} seconds so far!)
-
-#endif // If NOT distrubtion build
-
-#define SUCCESS_msg "GREAT SUCESS"
-#define WARNING_msg "Oh Wawaweewa..."
-#define FAILURE_msg "PAIN IN MY ASSHOLES"
-#define FAREWELL_msg "Good Hunting S.t.a.l.k.e.r"
-
-
-
-/*
-I deeply apologise for this inline mess
-
-Visual studio was giving me definition errors because of how this logger comes first and random tomfoolery with SPDLOG
-
-The easiest thing to do is copy Tout.cpp into the .hpp and define everything inline
-
-I apologise...
-
-*/
-
-
-
-
-
-namespace ENGINE::Log
-{
-#if DISTRUBTION == 0
-    inline static int LowestAllowedLevel = 0;
-
-    inline static std::shared_ptr<void*> Init_Log()
-    {
-        return nullptr;
-    }
-
-    inline static std::shared_ptr<void*> Init_Err_Log()
-    {
-        return nullptr;
-    }
-
-    inline static std::shared_ptr<void*> Init_Log(const char* LoggerName)
-    {
-        return nullptr;
-    }
-
-    inline static std::shared_ptr<void*> GetLogger()
-    {
-        return nullptr;
-    }
-
-    inline static std::shared_ptr<void*> GetLogger(const std::string LoggerName)
-    {
-        return nullptr;
-    }
-
-    inline static  std::shared_ptr<void*> GetLogger(const char* LoggerName)
-    {
-        return nullptr;
-    }
-
-
-    /// @brief What verbosity do we want to update all our logs to?
-    /// @param NewLevel 1: Debugging / Trace, 2: General Info, 3: Warnings, 4: Errors, 5: APOCALYPSE
-    /// @return True if success
-    inline static bool SetLoggerVerbosity(int NewLevel)
-    {
-        return false;
-    }
-#else
-
-    inline static int LowestAllowedLevel = 0;
-
-    std::shared_ptr<spdlog::logger> Init_Log()
-    {
-        return Init_Log(ENGINE_NAME);
-    }
-
-    std::shared_ptr<spdlog::logger> Init_Err_Log()
-    {
-        try
-        {
-            std::shared_ptr<spdlog::logger> errorLogger = spdlog::stdout_color_mt(log_errorLogName);
-            spdlog::set_error_handler([](const std::string& msg)
-                {
-                    spdlog::get(log_errorLogName)->error("*** {} ***: {}", FAILURE_msg, msg);
-                });
-
-            return errorLogger;
-        }
-        catch (const spdlog::spdlog_ex&)
-        {
-            return spdlog::get(log_errorLogName);
-        }
-    }
-
-    std::shared_ptr<spdlog::logger> Init_Log(const char* LoggerName)
-    {
-        if (Init_Err_Log() == nullptr)
-        {
-            //todo: Add error log init failure catch here
-        }
-
-        try
-        {
-            // Thanks https://www.w3schools.com/cpp/trycpp.asp?filename=demo_date_strftime
-            static time_t timestamp = time(nullptr);
-            static struct tm datetime = *localtime(&timestamp);
-            static char formatted_date[50];
-            strftime(formatted_date, 50, "%e %b %H-%M", &datetime);
-
-            static auto frontEndConsoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-
-            frontEndConsoleSink->set_pattern("-> [%H:%M %Ss]  %n: \t%^[%l]\t %v%$"); // -> [15:42 59s] [File Wizard] [info]    Hello :)
-            frontEndConsoleSink->set_level(spdlog::level::level_enum(LowestAllowedLevel));
-
-            static std::string filename = std::format("{}/logs/{} {}.log", std::filesystem::current_path().string(), ENGINE_NAME, formatted_date);
-            static auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
-            spdlog::flush_every(std::chrono::seconds(4));
-            std::vector<spdlog::sink_ptr> sinks{ frontEndConsoleSink, fileSink };
-
-            // ---------------------
-            // ASYNC IMPLEMENTATION | TODO: Fix
-            // ---------------------
-            //if (total_inits == 0)
-            //    spdlog::init_thread_pool(8192, 1);
-            //auto logger =       std::make_shared<spdlog::async_logger>(LoggerName, sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-            auto logger = std::make_shared<spdlog::logger>(LoggerName, sinks.begin(), sinks.end());
-            logger->set_level(spdlog::level::level_enum(LowestAllowedLevel)); // or info/warn
-            spdlog::register_logger(logger);
-
-            return logger;
-        }
-        catch (const spdlog::spdlog_ex& ex) // Logger probably already exists
-        {
-            std::cout << "Hey, Just so you know, we got SPDLOG tomfoolery here because " << ex.what() << std::endl;
-            return spdlog::get(LoggerName);
-        }
-    }
-
-    std::shared_ptr<spdlog::logger> GetLogger()
-    {
-        return GetLogger(ENGINE_NAME);
-    }
-
-    std::shared_ptr<spdlog::logger> GetLogger(const std::string LoggerName)
-    {
-        return GetLogger(LoggerName.c_str());
-    }
-
-    std::shared_ptr<spdlog::logger> GetLogger(const char* LoggerName)
-    {
-        // Use Init instead because if the logger doesn't exist we'll make one..very sketch
-        if (spdlog::get(LoggerName) == nullptr)
-        {
-            WARNc("HEY! {} DOESN'T EXIST YET... Making him now, Logs are saved at {} too", LoggerName, std::filesystem::current_path().string());
-            Init_Log(LoggerName);
-        }
-
-        return spdlog::get(LoggerName);
-    }
-
-
-    /// @brief What verbosity do we want to update all our logs to?
-    /// @param NewLevel 1: Debugging / Trace, 2: General Info, 3: Warnings, 4: Errors, 5: APOCALYPSE
-    /// @return True if success
-    inline static bool SetLoggerVerbosity(int NewLevel)
-    {
-
-        switch (NewLevel)
-        {
-        case 0:
-        case 1:
-            spdlog::set_level(spdlog::level::level_enum(0));
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-            spdlog::set_level(spdlog::level::level_enum(NewLevel));
-            break;
-        default:
-            WARNc("Hey, {} isn't a valid log level, it's between 0 (debug+trace) -> 4 (CRITICAL)", NewLevel);
-            return false;
-        }
-
-        LowestAllowedLevel = NewLevel;
-        return true;
-    }
-#endif
-
-}

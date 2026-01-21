@@ -1,8 +1,6 @@
 #pragma once
 
-#include "../Core/"
+#include "BaseModule.hpp"
  
-struct DaVinci
-{
-};
+int LINKTEST_RenderFolder();
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
-#include "../Core/Log.hpp"
+#include "Log.hpp"
 #include "TypeDefinitions.hpp"
-#include "../Utilities/Utilities.hpp"
+#include "Utilities.hpp"
 #include <string_view>
 
 namespace ENGINE
@@ -11,7 +11,7 @@ namespace ENGINE
     struct ENGINE_MODULE_INTERFACE
     {
     public:
-
+        
         std::string_view Get_Module_Name() const
         {
             if (m_module_title.empty())

@@ -1,10 +1,8 @@
 group "Modules"
-    project "Daft Punk"
-        kind "SharedLib" 
+    project "DaftPunk"
+        kind "StaticLib" 
         language "C++"
         cppdialect "C++23"
-
-        targetname "DaftPunk"
 
         files { "%{prj.location}/**" }
 
@@ -18,5 +16,6 @@ group "Modules"
         targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
         objdir ("%{wks.location}/Lib/Intermediates/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
 
+        dependson { "CoreModule" }
 
 group ""
