@@ -7,7 +7,7 @@
 
 int main()
 {
-    ENGINE::Runtime::ClientRuntime clientRuntime;
+    ENGINE::RUNTIME::ClientRuntime clientRuntime;
     clientRuntime.RenderMasterInsatnce = reinterpret_cast<ENGINE::Rendering::RenderMaster*>(ENGINE::Rendering::RenderDemo::GetDemoInstance());
     ENGINE::Platform::WindowManager::GetInstance()->SetWindowTitle("Simple Triangle", true);
 

@@ -12,7 +12,11 @@ namespace ENGINE
     {
     public:
         
-        std::string_view Get_Module_Name() const
+        ENGINE_MODULE_INTERFACE(std::string p_module_title) : m_module_title{p_module_title} {};
+        
+        
+        
+        std::string Get_Module_Name() const
         {
             if (m_module_title.empty())
             {
@@ -59,7 +63,7 @@ namespace ENGINE
         // --- End of Logging ------------------------------------------------------
         // -------------------------------------------------------------------------
 
-    protected:
-        std::string_view m_module_title;
+        std::string m_module_title;
+    
     };
 }

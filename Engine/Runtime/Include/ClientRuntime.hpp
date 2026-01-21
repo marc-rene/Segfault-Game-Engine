@@ -1,114 +1,42 @@
 #pragma once
 
 #include <chrono>
+#include <mutex>
+
+#include "DaVinci.hpp"
 #include "TypeDefinitions.hpp"
 #include "Log.hpp"
-#include "File_Wizard.hpp"
-#include "DaVinci.hpp"
 
-int LINKTEST_RuntimeFolder();
 
-namespace ENGINE::Runtime
+namespace ENGINE::RUNTIME
 {
-
     class ClientRuntime
     {
     public:
-        // Render ticks (1-1000 ticks a second)
-        void On_First_Ever_Frame();
-        void On_Frame_Start();		// early frame: events, paused?
-        void On_Frame_End();		// cleanup, frame sync, present
-        /*
-        virtual void On_Frame();			// render submission
-        virtual void On_Frame_UI();         // imgui / debug overlays
+        ClientRuntime();
 
-        virtual void On_ClientPaused();
+        bool CreateWindow(std::string Parent_Window_Name, int Initial_Width, int Initial_Height);
 
-        // Fixed ticks (60 ticks a second)
-        virtual void On_First_Ever_FixedTick();
-        */
-
-        void On_FixedTick_Start();
-        void On_FixedTick_Body() {};
-        void On_FixedTick_End();
-
-        void On_FixedTick();
-
-
-
-
-        inline static void Shutdown()
-        {
-            INFO("ENGINE::Runtime::ClientRuntime", "SHUTTING DOWN ALL OPERATIONS");
-            KeepRunning = false;
-        }
-
-        inline static bool IsRunning()
-        {
-            return KeepRunning;
-        }
-
-        bool EnableEditor()
-        {
-            false;
-            //return ENGINE::Editor::GetInstance()->Is_Initialised();
-        }
-
-        ClientRuntime()
-        {
-            FenceValue = 0;
-
-            KeepRunning = true;
-            ENGINE::Log::Init_Log();
-            ENGINE::Log::Init_Err_Log();
-            //ENGINE::Settings::ActiveSettings::Initialise();
-
-            //auto windowManager_ref = ENGINE::Platform::WindowManager::GetInstance();
-            //windowManager_ref->CreateMainWindow();
-        }
-
-        inline static const long long GetFixedTickDeltaTimeMicroSeconds()
-        {
-            return LastFixedTickDeltaTimeMicroSeconds.count();
-        }
-        inline static const float GetFixedTickDeltaTimeMiliSeconds()
-        {
-            return LastFixedTickDeltaTimeMicroSeconds.count() / 1000.0f;
-        }
-        inline static const double GetFixedTickDeltaTimeMiliSeconds_double()
-        {
-            return LastFixedTickDeltaTimeMicroSeconds.count() / 1000.0;
-        }
-
-        inline static long long GetFixedTickDeltaTimeMicroSeconds_Average()
-        {
-            long long temp;
-            temp = 0;
-            for (int i = 0; i < 32; i++)
-            {
-                temp += AverageFixedTickDT_DataSet[i];
-            }
-            return (temp / 32);
-        }
-
-        ~ClientRuntime()
-        {
-            //ENGINE::Platform::FileIO::Config::Flush();
-        }
+        void Pre_tick();
+        void Tick();
+        void Post_tick();
         
+        bool* Is_Running()
+        {
+            return &KeepRunning;
+        }
 
     private:
+        ENGINE::GRAPHICS::DaVinci DaVinci_Instance;
+        inline static bool KeepRunning = false;
+        std::mutex Shutdown_Mutex;
+
         const uMint FixedTickRate = 60;
         inline static unsigned long long FenceValue = 0;
-        inline static bool KeepRunning = false;
         inline static std::chrono::steady_clock::time_point FixedTickStartTimestamp;
         inline static std::chrono::microseconds LastFixedTickDeltaTimeMicroSeconds;
         inline static long long AverageFixedTickDT_DataSet[32] = {};
         inline static std::mutex DT_Mutex;
         inline static std::mutex EventPolling_Mutex;
-
-
-
-
     };
 };

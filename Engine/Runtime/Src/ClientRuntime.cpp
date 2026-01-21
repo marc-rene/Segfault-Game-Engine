@@ -1,10 +1,30 @@
 #include "../Include/ClientRuntime.hpp"
 
-int LINKTEST_RuntimeFolder()
+#include "DaVinci.hpp"
+
+
+ENGINE::RUNTIME::ClientRuntime::ClientRuntime()
 {
-    return 43;
+    DaVinci_Instance = ENGINE::GRAPHICS::DaVinci();
+    DaVinci_Instance.Initialise_Context();
+    KeepRunning = true;
 }
 
+bool ENGINE::RUNTIME::ClientRuntime::CreateWindow(std::string Parent_Window_Name, int Initial_Width, int Initial_Height)
+{
+    return DaVinci_Instance.New_Parent_Window(Parent_Window_Name, Initial_Width, Initial_Height);
+}
+
+void ENGINE::RUNTIME::ClientRuntime::Pre_tick()
+{
+    if (DaVinci_Instance.Check_For_Events() == GRAPHICS::DaVinci::QUIT)
+    {
+        Shutdown_Mutex.lock();
+        KeepRunning = false;
+        Shutdown_Mutex.unlock();
+    }
+    DaVinci_Instance.Check_For_Events();
+}
 
 /*
 void ENGINE::Runtime::ClientRuntime::On_First_Ever_Frame()

@@ -31,4 +31,12 @@ group "Modules"
         
 group ""
 
+group "ThirdParty"
+    externalproject  "SDL3"
+        location "%{wks.location}/Engine/ThirdParty/SDL/VisualC/SDL"
+        uuid "81CE8DAF-EBB2-4761-8E45-B71ABCCA8C68" 
+        kind "StaticLib"
+        language "C"
 
+        targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
+        objdir ("%{wks.location}/Lib/Intermediates/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
