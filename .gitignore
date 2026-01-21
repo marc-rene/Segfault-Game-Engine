@@ -60,7 +60,7 @@ SegFault Editor/Vendor/SDL/examples
 
 # Exclude
 !Setup/Binaries
-!Setup/Binaries/Windows/premake.exe
+!Setup/Binaries/Windows/premake5.exe
 
 
 
