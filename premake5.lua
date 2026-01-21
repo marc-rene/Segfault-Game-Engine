@@ -150,6 +150,8 @@ group "Examples"
             "%{wks.location}/Engine/Modules/Rendering/Include",
         }
 
+        postbuildcommands { "{COPYFILE} %[%{!wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/SDL3/SDL3.dll] %[%{!wks.location}/Binaries/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}]" }
+
 
         dependson { "ApocalypseRuntime", "imgui_sdl3_d3d", "SDL", "CoreModule" }
         links { "dxgi", "d3d12", "ApocalypseRuntime", "SDL", "CoreModule" }
