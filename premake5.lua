@@ -141,8 +141,8 @@ group "Examples"
         }
 
 
-        dependson { "ApocalypseRuntime", "imgui_sdl3_d3d", "SDL" }
-        links { "dxgi", "d3d12", "ApocalypseRuntime" }
+        dependson { "ApocalypseRuntime", "imgui_sdl3_d3d", "SDL", "CoreModule" }
+        links { "dxgi", "d3d12", "ApocalypseRuntime", "SDL", "CoreModule" }
 
     end)
 group ""

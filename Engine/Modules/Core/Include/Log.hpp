@@ -1,7 +1,10 @@
 #pragma once
 
 #include <iostream>
-
+#include <format>
+#include <string>
+#include <string_view>
+#include <utility>
 
 #define DEFAULT_LOG_NAME    "Toute"
 #define ERROR_LOG_NAME      "TOMFOOLERY"
@@ -12,48 +15,67 @@
 #define FAILURE_msg     "PAIN IN MY ASSHOLES"
 #define FAREWELL_msg    "Good Hunting S.T.A.L.K.E.R"
 
-
-
 namespace ENGINE
 {
+    enum class LogLevel { Trace, Info, Warn, Error, Critical };
+
     struct Log
     {
         static void Init_Log();
         static void Init_Log(std::string LoggerName);
         static void Init_Err_Log();
 
-
         inline static bool is_first_init() { return first_init; }
-
 
         /// @brief What verbosity do we want to update all our logs to?
         /// @param NewLevel 1: Debugging / Trace, 2: General Info, 3: Warnings, 4: Errors, 5: APOCALYPSE
         /// @return True if success
         static bool SetLoggerVerbosity(int NewLevel);
 
+        // Non-template sink (implemented in Log.cpp)
+        static void Write(LogLevel level, std::string_view LoggerName, std::string_view message);
+
+        // Header-only wrappers (templates MUST live in the header)
+        template <class... Args>
+        static void Trace(std::string_view LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
+        {
+            const std::string_view name = LoggerName.empty() ? std::string_view(DEFAULT_LOG_NAME) : LoggerName;
+            Write(LogLevel::Trace, name, std::format(fmtStr, std::forward<Args>(args)...));
+        }
 
         template <class... Args>
-        static void Trace(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
+        static void Info(std::string_view LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
+        {
+            const std::string_view name = LoggerName.empty() ? std::string_view(DEFAULT_LOG_NAME) : LoggerName;
+            Write(LogLevel::Info, name, std::format(fmtStr, std::forward<Args>(args)...));
+        }
 
         template <class... Args>
-        static void Info(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
+        static void Warn(std::string_view LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
+        {
+            const std::string_view name = LoggerName.empty() ? std::string_view(DEFAULT_LOG_NAME) : LoggerName;
+            Write(LogLevel::Warn, name, std::format(fmtStr, std::forward<Args>(args)...));
+        }
 
         template <class... Args>
-        static void Warn(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
+        static void Error(std::string_view LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
+        {
+            const std::string_view name = LoggerName.empty() ? std::string_view(ERROR_LOG_NAME) : LoggerName;
+            Write(LogLevel::Error, name, std::format(fmtStr, std::forward<Args>(args)...));
+        }
 
         template <class... Args>
-        static void Error(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
-
-        template <class... Args>
-        static void Critical(std::string LoggerName, std::format_string<Args...> fmt, Args&&... args);
+        static void Critical(std::string_view LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
+        {
+            const std::string_view name = LoggerName.empty() ? std::string_view(ERROR_LOG_NAME) : LoggerName;
+            Write(LogLevel::Critical, name, std::format(fmtStr, std::forward<Args>(args)...));
+        }
 
     private:
         inline static bool first_init = true;
         inline static int LowestAllowedLevel = 0;
     };
 }
-
-
 
 #define TRACEc(...)                                                                                         \
     {                                                                                                       \
@@ -148,7 +170,6 @@ namespace ENGINE
 			std::cout << std::format("\n!!!FUCK FUCK ERROR: {}!!!\n", e.what()) << std::format(__VA_ARGS__);\
 		}                                                                                                   \
 	}
-
 
 #define CRITICAL(...)                                                                                               \
     {                                                                                                               \

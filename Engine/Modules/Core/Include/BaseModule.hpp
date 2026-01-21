@@ -32,28 +32,28 @@ namespace ENGINE
         // -------------------------------------------------------------------------
         // --- Logging        ------------------------------------------------------
 
-        void Trace(std::string_view message, std::format_args arguments = std::make_format_args())
+        virtual void Trace(std::string_view message, std::format_args arguments = std::make_format_args())
         {
             auto msg = std::vformat(message, arguments);
 
             TRACE(std::string(m_module_title), "{}", msg);
         }
 
-        void Info(std::string_view message, std::format_args arguments = std::make_format_args())
+        virtual void Info(std::string_view message, std::format_args arguments = std::make_format_args())
         {
             auto msg = std::vformat(message, arguments);
 
             INFO(std::string(m_module_title), "{}", msg);
         }
 
-        void Warn(std::string_view message, std::format_args arguments = std::make_format_args())
+        virtual void Warn(std::string_view message, std::format_args arguments = std::make_format_args())
         {
             auto msg = std::vformat(message, arguments);
 
             WARN(std::string(m_module_title), "{}", msg);
         }
 
-        void Error(std::string_view message, std::format_args arguments = std::make_format_args())
+        virtual void Error(std::string_view message, std::format_args arguments = std::make_format_args())
         {
             auto msg = std::vformat(message, arguments);
 

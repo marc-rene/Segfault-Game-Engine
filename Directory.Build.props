@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+  </PropertyGroup>
+
+  <!-- Only apply to the external SDL project -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)'=='SDL'">
+    <!-- Match your engine layout -->
+    <OutDir>$(RepoRoot)Lib\$(Configuration)\$(MSBuildProjectName)\</OutDir>
+    <IntDir>$(RepoRoot)Intermediate\$(Configuration)\$(MSBuildProjectName)\</IntDir>
+    <TargetDir>$(OutDir)</TargetDir>
+  </PropertyGroup>
+</Project>

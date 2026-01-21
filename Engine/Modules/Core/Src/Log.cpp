@@ -104,109 +104,31 @@ namespace ENGINE
         }
     }
 
-
-    /// @param LoggerName Name of logger to use... if you don't know you can use CRITICAL log macro instead
-    /// @param fmtStr The string that your arguments will go into using '{}'  eg: ("Salut {} {}", "Maman", 5) 
-    /// @param args What arguemnts do you want to put into your string?
-    template <class... Args>
-    void Log::Trace(std::string LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
+    void ENGINE::Log::Write(LogLevel level, std::string_view LoggerName, std::string_view message)
     {
+        // Resolve logger name
+        std::string name;
         if (LoggerName.empty())
         {
-            GetLogger(DEFAULT_LOG_NAME)->trace(fmtStr, std::forward<Args>(args)...);
+            name = (level == LogLevel::Error || level == LogLevel::Critical)
+                     ? std::string(ERROR_LOG_NAME)
+                     : std::string(DEFAULT_LOG_NAME);
         }
         else
         {
-            GetLogger(LoggerName)->trace(fmtStr, std::forward<Args>(args)...);
+            name = std::string(LoggerName);
+        }
+
+        // Map to spdlog level and emit
+        switch (level)
+        {
+        case LogLevel::Trace:    GetLogger(name)->log(spdlog::level::trace,    message); break;
+        case LogLevel::Info:     GetLogger(name)->log(spdlog::level::info,     message); break;
+        case LogLevel::Warn:     GetLogger(name)->log(spdlog::level::warn,     message); break;
+        case LogLevel::Error:    GetLogger(name)->log(spdlog::level::err,      message); break;
+        case LogLevel::Critical: GetLogger(name)->log(spdlog::level::critical, message); break;
+        default:                 GetLogger(name)->log(spdlog::level::info,     message); break;
         }
     }
 
-
-    /// @param LoggerName Name of logger to use... if you don't know you can use CRITICAL log macro instead
-    /// @param fmtStr The string that your arguments will go into using '{}'  eg: ("Salut {} {}", "Maman", 5) 
-    /// @param args What arguemnts do you want to put into your string?
-    template <class... Args>
-    void Log::Info(std::string LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
-    {
-        if (LoggerName.empty())
-        {
-            GetLogger(DEFAULT_LOG_NAME)->info(fmtStr, std::forward<Args>(args)...);
-        }
-        else
-        {
-            GetLogger(LoggerName)->info(fmtStr, std::forward<Args>(args)...);
-        }
-    }
-
-
-    /// @param LoggerName Name of logger to use... if you don't know you can use CRITICAL log macro instead
-    /// @param fmtStr The string that your arguments will go into using '{}'  eg: ("Salut {} {}", "Maman", 5) 
-    /// @param args What arguemnts do you want to put into your string?
-    template <class... Args>
-    void Log::Warn(std::string LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
-    {
-        if (LoggerName.empty())
-        {
-            GetLogger(DEFAULT_LOG_NAME)->warn(fmtStr, std::forward<Args>(args)...);
-        }
-        else
-        {
-            GetLogger(LoggerName)->warn(fmtStr, std::forward<Args>(args)...);
-        }
-    }
-
-
-    /// @param LoggerName Name of logger to use... you can use CRITICAL log macro instead, or leave nullptr
-    /// @param fmtStr The string that your arguments will go into using '{}'  eg: ("Salut {} {}", "Maman", 5)
-    /// @param args What arguemnts do you want to put into your string?
-    template <class... Args>
-    void Log::Error(std::string LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
-    {
-        if (LoggerName.empty())
-        {
-            GetLogger(ERROR_LOG_NAME)->error(fmtStr, std::forward<Args>(args)...);
-        }
-        else
-        {
-            GetLogger(LoggerName)->error(fmtStr, std::forward<Args>(args)...);
-        }
-    }
-
-
-    /// @param LoggerName Name of logger to use... if you don't know you can use CRITICAL log macro instead
-    /// @param fmtStr The string that your arguments will go into using '{}'  eg: ("Salut {} {}", "Maman", 5) 
-    /// @param args What arguemnts do you want to put into your string?
-    template <class... Args>
-    void Log::Critical(std::string LoggerName, std::format_string<Args...> fmtStr, Args&&... args)
-    {
-        if (LoggerName.empty())
-        {
-            GetLogger(ERROR_LOG_NAME)->critical(fmtStr, std::forward<Args>(args)...);
-        }
-        else
-        {
-            GetLogger(LoggerName)->critical(fmtStr, std::forward<Args>(args)...);
-        }
-    }
-
-
-    /// @brief What verbosity do we want to update all our logs to?
-    /// @param NewLevel 1: Debugging / Trace, 2: General Info, 3: Warnings, 4: Errors, 5: APOCALYPSE
-    /// @return True if success
-    bool Log::SetLoggerVerbosity(int NewLevel)
-    {
-        LowestAllowedLevel = std::clamp(NewLevel, 1, 5);
-
-        try
-        {
-            spdlog::set_level(spdlog::level::level_enum(LowestAllowedLevel));
-            return true;
-        }
-        catch (std::exception& ex)
-        {
-            WARNc("Couldn't change logger verbsoity to {} because {}", LowestAllowedLevel, ex.what());
-            return false;
-        }
-    } // end SetLoggerVerbosity
-    
 } //end Engine Namespace

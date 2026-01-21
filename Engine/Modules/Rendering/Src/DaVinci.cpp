@@ -1,6 +1,6 @@
 #include "../Include/DaVinci.hpp"
 
-#include <SDL3/SDL_main.h>
+#include <SDL3/SDL_init.h>
 
 #include "SDL3/SDL_video.h"
 
