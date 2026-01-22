@@ -12,8 +12,10 @@ int main()
     while (*Runtime.Is_Running() == true)
     {
         Runtime.Pre_tick();
-
         
+        Runtime.Tick();
+
+        Runtime.Post_tick();
     }
     
     return 0;
