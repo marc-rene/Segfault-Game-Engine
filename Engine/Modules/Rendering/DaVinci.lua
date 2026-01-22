@@ -12,6 +12,7 @@ group "Modules"
             "%{wks.location}/Engine/ThirdParty/DirectX_12_Memory_Allocator/include",
             "%{wks.location}/Engine/ThirdParty/DirectX_12_Toolkit/Inc",
             "%{wks.location}/Engine/ThirdParty/DirectX_Math/Inc",
+            "%{wks.location}/Engine/ThirdParty/DirectX_Headers/include/directx",
             "%{wks.location}/Engine/ThirdParty/SDL/include",
 
 

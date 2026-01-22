@@ -25,3 +25,6 @@
 [submodule "Engine/ThirdParty/SDL"]
 	path = Engine/ThirdParty/SDL
 	url = https://github.com/libsdl-org/SDL.git
+[submodule "Engine/ThirdParty/DirectX_Headers"]
+	path = Engine/ThirdParty/DirectX_Headers
+	url = https://github.com/microsoft/DirectX-Headers.git
