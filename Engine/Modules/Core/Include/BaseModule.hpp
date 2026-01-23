@@ -11,11 +11,11 @@ namespace ENGINE
     struct ENGINE_MODULE_INTERFACE
     {
     public:
-        
-        ENGINE_MODULE_INTERFACE(std::string p_module_title) : m_module_title{p_module_title} {};
-        
-        
-        
+        ENGINE_MODULE_INTERFACE(std::string p_module_title) : m_module_title{p_module_title}
+        {
+        };
+
+
         std::string Get_Module_Name() const
         {
             if (m_module_title.empty())
@@ -26,7 +26,6 @@ namespace ENGINE
 
             return m_module_title;
         }
-
 
 
         // -------------------------------------------------------------------------
@@ -60,10 +59,16 @@ namespace ENGINE
             OhSHIT(std::string(m_module_title), "{}", msg);
         }
 
+        virtual void Critical(std::string_view message, std::format_args arguments = std::make_format_args())
+        {
+            auto msg = std::vformat(message, arguments);
+
+            CRITICAL("{}", msg);
+        }
+
         // --- End of Logging ------------------------------------------------------
         // -------------------------------------------------------------------------
 
         std::string m_module_title;
-    
     };
 }

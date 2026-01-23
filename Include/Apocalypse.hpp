@@ -7,7 +7,7 @@
 
 #include "../Engine/Modules/Audio/Include/Daft_Punk.hpp"
 #include "../Engine/Modules/ECS/Include/Swarm.hpp"
-#include "../Engine/Modules/Editor/Include/Editor.hpp"
+#include "../Engine/Modules/Editor/Include/Nitpick.hpp"
 #include "../Engine/Modules/Networking/Include/Packet_Ninja.hpp"
 #include "../Engine/Modules/Platform/Include/File_Wizard.hpp"
 #include "../Engine/Modules/Rendering/Include/DaVinci.hpp"

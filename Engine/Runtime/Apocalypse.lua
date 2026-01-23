@@ -20,19 +20,17 @@ project "ApocalypseRuntime"
         "%{wks.location}/Engine/ThirdParty/Spdlog/include",
     }
 
-    --dependson {
-    --    "File Wizard",
-    --    "Packet Ninja",
-    --    "Daft Punk",
-    --    "Swarm",
-    --    "DaVinci",
-    --    "NitPick"
-    --}
+
     
     targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
     objdir ("%{wks.location}/Lib/Intermediates/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
     
     links { 
+        "FileWizard",   "PacketNinja",  "DaftPunk",
+        "Swarm",        "DaVinci",      "NitPick",
+    } 
+
+    dependson { 
         "FileWizard",   "PacketNinja",  "DaftPunk",
         "Swarm",        "DaVinci",      "NitPick",
     } 

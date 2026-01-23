@@ -131,6 +131,19 @@ bool ENGINE::GRAPHICS::DaVinci::Initialise_Context(bool use_default)
     return SDL_Init(SDL_INIT_VIDEO);
 }
 
+float ENGINE::GRAPHICS::DaVinci::Get_Main_Display_Scale()
+{
+    SDL_DisplayID current_display_id = SDL_GetDisplayForWindow(static_cast<SDL_Window*>(Get_Parent_Window_ptr()));
+
+    if (current_display_id == 0)
+    {
+        Error("Hey! Get_Main_Display_Scale() + SDL_GetDisplayForWindow() is failing to get ANY display ID");
+        return 1.0f;
+    }
+
+    return SDL_GetDisplayContentScale(current_display_id);
+}
+
 
 ENGINE::GRAPHICS::DaVinci::E_EventType ENGINE::GRAPHICS::DaVinci::Check_For_Events()
 {
@@ -731,7 +744,7 @@ void ENGINE::GRAPHICS::DaVinci::Update()
 
 
     frameCounter++;
-    
+
     if (Pipeline_Objects::is_first_frame)
     {
         return;
@@ -912,6 +925,7 @@ void ENGINE::GRAPHICS::DaVinci::Set_FullScreen(bool use_fullscreen)
     }
 }
 
+
 void ENGINE::GRAPHICS::DaVinci::Finish_Frame()
 {
     g_Pipeline_Objects.is_first_frame = false;
@@ -927,4 +941,46 @@ std::string ENGINE::GRAPHICS::DaVinci::Get_Window_Name_From_HWND(HWND hWnd)
     std::string result = buffer;
 
     return result;
+}
+
+
+void ENGINE::GRAPHICS::DaVinci::Set_Clear_Colour(float red, float green, float blue, float alpha)
+{
+    g_Pipeline_Objects.clear_colour[0] = red;
+    g_Pipeline_Objects.clear_colour[1] = green;
+    g_Pipeline_Objects.clear_colour[2] = blue;
+    g_Pipeline_Objects.clear_colour[3] = alpha;
+}
+
+
+ComPtr<ID3D12Device2> ENGINE::GRAPHICS::DaVinci::Get_Active_Device() const
+{
+    return g_Pipeline_Objects.g_Device;
+}
+
+
+ComPtr<ID3D12CommandQueue> ENGINE::GRAPHICS::DaVinci::Get_Active_CommandQueue() const
+{
+    return g_Pipeline_Objects.g_CommandQueue;
+}
+
+
+int ENGINE::GRAPHICS::DaVinci::Get_Number_of_Frames_In_Flight() const
+{
+    return g_Pipeline_Objects.frames_in_flight;
+}
+
+
+DXGI_FORMAT ENGINE::GRAPHICS::DaVinci::Get_RTV_Frame_Buffer_Format() const
+{
+    return g_Pipeline_Objects.g_frameBufferFormat;
+}
+
+
+void ENGINE::GRAPHICS::DaVinci::transition_resource(ComPtr<ID3D12GraphicsCommandList2> commandList,
+                                                    ComPtr<ID3D12Resource> resource,
+                                                    D3D12_RESOURCE_STATES beforeState,
+                                                    D3D12_RESOURCE_STATES afterState)
+{
+    
 }

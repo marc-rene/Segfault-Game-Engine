@@ -9,13 +9,16 @@ group "Modules"
         includedirs 
         {
             "%{wks.location}/Engine/Modules/Core/Include",
-
+            "%{wks.location}/Engine/Modules/Rendering/Include",
+            "%{wks.location}/Engine/ThirdParty/ImGui",
         }
         
         targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
         objdir ("%{wks.location}/Lib/Intermediates/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
 
-        dependson { "CoreModule", "DaVinci", "imgui_sdl3_d3d" }
+        dependson { "CoreModule", "DaVinci", "imgui_sdl3_d3d", "SDL" }
+
+        links { "CoreModule", "DaVinci" }
         
 group ""
 
@@ -30,6 +33,7 @@ group "ThirdParty"
         files {
             --"%{prj.location}/**",
             
+            "%{wks.location}/Engine/ThirdParty/ImGui/*.*",       
             "%{wks.location}/Engine/ThirdParty/ImGui/backends/imgui_impl_dx11.*",       
             "%{wks.location}/Engine/ThirdParty/ImGui/backends/imgui_impl_dx12.*",       
             "%{wks.location}/Engine/ThirdParty/ImGui/backends/imgui_impl_sdl3.*",       

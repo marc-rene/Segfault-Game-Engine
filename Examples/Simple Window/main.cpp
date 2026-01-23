@@ -8,6 +8,7 @@ int main()
     
     ENGINE::RUNTIME::ClientRuntime Runtime;
     Runtime.Create_Window("Nothing to see here...", 1920, 1080);
+    //Runtime.Enable_Editor();
     
     while (*Runtime.Is_Running() == true)
     {

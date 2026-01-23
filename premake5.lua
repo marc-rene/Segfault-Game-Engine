@@ -148,13 +148,14 @@ group "Examples"
             "%{wks.location}/Engine/Modules/Core/Include",
             "%{wks.location}/Engine/Modules/Platform/Include",
             "%{wks.location}/Engine/Modules/Rendering/Include",
+            "%{wks.location}/Engine/Modules/Editor/Include",
         }
 
         postbuildcommands { "{COPYFILE} %[%{!wks.location}Lib/%{cfg.architecture}/%{cfg.buildcfg}/SDL3/SDL3.dll] %[%{!wks.location}/Binaries/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}]" }
 
 
         dependson { "ApocalypseRuntime", "imgui_sdl3_d3d", "SDL", "CoreModule" }
-        links { "dxgi", "d3d12", "ApocalypseRuntime", "SDL", "CoreModule" }
+        links { "dxgi", "d3d12", "ApocalypseRuntime", "SDL", "CoreModule", "imgui_sdl3_d3d", "d3dcompiler"}
 
     end)
 group ""

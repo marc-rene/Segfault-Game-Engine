@@ -18,7 +18,7 @@
 #endif
 
 
-// Windows Runtime Library. Needed for Microsoft::WRL::ComPtr<> template class.
+// Windows Runtime Library. Needed for ComPtr<> template class.
 #include <wrl.h>
 using namespace Microsoft::WRL;
 
@@ -46,13 +46,17 @@ namespace ENGINE::GRAPHICS
         /// @param initial_width 1600px wide by default
         /// @param initial_height 900px high by default
         /// @return Success?
-        bool New_Parent_Window(std::string Parent_Window_Name, int initial_width = 1600, int initial_height = 900, bool resizable = true);
+        bool New_Parent_Window(std::string Parent_Window_Name, int initial_width = 1600, int initial_height = 900,
+                               bool resizable = true);
 
 
         /// Let's actually get our directX context and data up and running!
         /// @param use_default Use Default settings or load config vars? TODO: Implement config vars
         /// @return Success?
         bool Initialise_Context(bool use_default);
+
+
+        float Get_Main_Display_Scale();
 
 
         // Stand-in for SDL_EventType because we don't want SDL include hell
@@ -68,17 +72,17 @@ namespace ENGINE::GRAPHICS
             ENTERED_BACKGROUND,
             ENTERED_FOREGROUND,
             DARK_MODE_THEME_CHANGED,
-            
+
             DISPLAY_ADDED,
             DISPLAY_REMOVED,
             DISPLAY_HDR_STATUS_CHANGED,
-            
+
             // --- Keyboard Events ---//
             KEY_DOWN,
             KEY_UP,
             KEYMAP_CHANGED,
             // -----------------------//
-            
+
             // ---  Mouse Events   ---//
             MOUSE_ENTERED_WINDOW,
             MOUSE_HAS_MOVED,
@@ -86,7 +90,7 @@ namespace ENGINE::GRAPHICS
             MOUSE_BUTTON_UP,
             MOUSE_WHEEL_MOVED,
             // -----------------------//
-            
+
             // --- Gamepad Events --- //
             GAMEPAD_AXIS_MOTION,
             GAMEPAD_BUTTON_DOWN,
@@ -98,11 +102,11 @@ namespace ENGINE::GRAPHICS
             GAMEPAD_TOUCHPAD_MOTION,
             GAMEPAD_TOUCHPAD_UP,
             // -----------------------//
-            
+
             // ---  Audio Events   ---//
             AUDIO_DEVICE_ADDED,
             AUDIO_DEVICE_REMOVED,
-            AUDIO_DEVICE_FORMAT_CHANGED,            
+            AUDIO_DEVICE_FORMAT_CHANGED,
             // -----------------------//
         };
 
@@ -118,7 +122,8 @@ namespace ENGINE::GRAPHICS
         ///     
         ///     2 - FULL POWER
         uint8_t Get_Power_Setting() const;
-        
+
+
         // Parent_Window_ptr is ACTUALLY a SDL_Window*... but let's get it as a void*
         void* Get_Parent_Window_ptr() const;
 
@@ -245,36 +250,90 @@ namespace ENGINE::GRAPHICS
         /// is allowed to continue processing.
         void Flush(ComPtr<ID3D12CommandQueue> commandQueue, ComPtr<ID3D12Fence> fence,
                    uint64_t& fenceValue, HANDLE fenceEvent);
-        
-        
+
+
         // At the moment we just get the frame-rate
         void Update();
-        
-        
+
+
         // At the moment we ONLY 1: Clear back buffer; 2: Present Rendered Frame
         void Render();
-        
-        
+
+
         // This should be triggered by Check_For_Events()
         void Resize();
 
-        
+
         // True: LETS GO BORDERLESS FULLSCREEN YAY!    False: Nah go back to window
         void Set_FullScreen(bool use_fullscreen);
 
         // Finish up last bits after our frame's rendered! Mostly DT calculations
         void Finish_Frame();
-        
-        
-        
+
+
+        // Gets a Window... finds the name of it... that's it
         static std::string Get_Window_Name_From_HWND(HWND hWnd);
-        
+
+
+        // This is more so for our CommandQueue and NitPick editor...
+        inline static DaVinci* Get_Instance()
+        {
+            return self_ptr;
+        }
+
+
+        inline static void Set_New_DaVinci_Instance(DaVinci* new_instance_ptr)
+        {
+            self_ptr = new_instance_ptr;
+        }
+
+
+        /// Set the colour of the background when nothing is rendered
+        /// @param red red amount (0-1)
+        /// @param green green amount (0-1)
+        /// @param blue blue amount (0-1)
+        /// @param alpha ngl I'm currious what happens when you have a transparent clear colour?
+        void Set_Clear_Colour(float red, float green, float blue, float alpha);
+
+
+        ComPtr<ID3D12Device2> Get_Active_Device() const;
+
+        ComPtr<ID3D12CommandQueue> Get_Active_CommandQueue() const;
+
+        int Get_Number_of_Frames_In_Flight() const;
+
+        DXGI_FORMAT Get_RTV_Frame_Buffer_Format() const;
+
+        DXGI_FORMAT Get_Depth_Stencil_View_Frame_Buffer_Format() const;
+
     private:
+        inline static DaVinci* self_ptr;
+
         void* Parent_Window_ptr;
 
-        inline static std::chrono::time_point<std::chrono::steady_clock> start_frame_render_time = std::chrono::high_resolution_clock::now(); 
-        inline static std::chrono::time_point<std::chrono::steady_clock> end_frame_render_time = std::chrono::high_resolution_clock::now(); 
-        
+        inline static std::chrono::time_point<std::chrono::steady_clock> start_frame_render_time =
+            std::chrono::high_resolution_clock::now();
+        inline static std::chrono::time_point<std::chrono::steady_clock> end_frame_render_time =
+            std::chrono::high_resolution_clock::now();
+
+
+        // Transition a resource to a particular state before using it. For example, 
+        // before a texture can be used in a pixel shader, it must be transitioned to the PIXEL_SHADER_RESOURCE state.
+        void transition_resource(ComPtr<ID3D12GraphicsCommandList2> commandList,
+                                 ComPtr<ID3D12Resource> resource,
+                                 D3D12_RESOURCE_STATES beforeState, D3D12_RESOURCE_STATES afterState);
+
+
+        // Clear a render target view.
+        void clear_rtv(ComPtr<ID3D12GraphicsCommandList2> commandList,
+                       D3D12_CPU_DESCRIPTOR_HANDLE rtv, FLOAT* clearColor);
+
+
+        // Clear the depth of a depth-stencil view.
+        void clear_depth(ComPtr<ID3D12GraphicsCommandList2> commandList,
+                         D3D12_CPU_DESCRIPTOR_HANDLE dsv, FLOAT depth = 1.0f);
+
+
         struct Render_Settings
         {
             struct Display_Settings
@@ -298,7 +357,7 @@ namespace ENGINE::GRAPHICS
             // TODO: Make this configuarable... 2 is good for fps, 3 is good for more smooth
             static constexpr UINT frames_in_flight = 2;
             inline static FLOAT clear_colour[4] = {0.4f, 0.6f, 0.9f, 1.0f};;
-            
+
             /// What Power setting should we use?
             /// 
             ///     0 - Don't render... pause frame
@@ -307,8 +366,8 @@ namespace ENGINE::GRAPHICS
             ///     
             ///     2 - FULL POWER
             inline static uint8_t power_mode = 2;
-            
-            
+
+
             // Pipeline objects
             inline static bool is_initialised = false;
             inline static bool is_first_frame = true;
@@ -321,7 +380,7 @@ namespace ENGINE::GRAPHICS
             //          need to correct the colour space and metadata, especially for HDR10!
             // DXGI_FORMAT_R16G16B16A16_FLOAT: 16-bit... BEST HDR, almost NO banding... but DAMN it's expensive
             inline static DXGI_FORMAT g_frameBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-            
+
             uint32_t g_FrameBufferWidth;
             uint32_t g_FrameBufferHeight;
 

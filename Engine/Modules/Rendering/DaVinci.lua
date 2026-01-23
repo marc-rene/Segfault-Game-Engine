@@ -21,7 +21,7 @@ group "Modules"
         targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
         objdir ("%{wks.location}/Lib/Intermediates/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
 
-        dependson { "CoreModule" }
+        dependson { "CoreModule", "SDL"}
 
         links 
         { 
