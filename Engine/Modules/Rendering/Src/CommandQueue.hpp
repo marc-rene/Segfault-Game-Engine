@@ -1,6 +1,12 @@
 ﻿#pragma once
 
-#include "../Include/DaVinci.hpp"
+//#include "../Include/DaVinci.hpp"
+#include <d3dx12.h>
+
+
+// Windows Runtime Library. Needed for ComPtr<> template class.
+#include <wrl.h>
+using namespace Microsoft::WRL;
 
 #include <cstdint>  // For uint64_t
 #include <queue>    // For std::queue

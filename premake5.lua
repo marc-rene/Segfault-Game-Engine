@@ -149,6 +149,7 @@ group "Examples"
             "%{wks.location}/Engine/Modules/Platform/Include",
             "%{wks.location}/Engine/Modules/Rendering/Include",
             "%{wks.location}/Engine/Modules/Editor/Include",
+            "%{wks.location}/Engine/ThirdParty/DirectX_Headers/include/directx",
         }
 
         postbuildcommands { "{COPYFILE} %[%{!wks.location}Lib/%{cfg.architecture}/%{cfg.buildcfg}/SDL3/SDL3.dll] %[%{!wks.location}/Binaries/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}]" }

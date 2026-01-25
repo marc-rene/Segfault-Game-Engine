@@ -59,8 +59,9 @@ bool ENGINE::GRAPHICS::DaVinci::New_Parent_Window(std::string name, int w, int h
     }
     g_Pipeline_Objects.g_FrameBufferWidth = w;
     g_Pipeline_Objects.g_FrameBufferHeight = h;
-
-
+    g_Pipeline_Objects.g_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
+    g_Pipeline_Objects.g_ScissorRect = CD3DX12_RECT(0, 0, LONG_MAX, LONG_MAX);
+    
     ComPtr<IDXGIAdapter4> dxgiAdapter4 = Get_Best_Graphics_Adapter();
 
 
@@ -68,13 +69,13 @@ bool ENGINE::GRAPHICS::DaVinci::New_Parent_Window(std::string name, int w, int h
     g_Pipeline_Objects.g_Device = Create_Device(dxgiAdapter4);
 
 
-    g_Pipeline_Objects.g_CommandQueue = Create_Command_Queue(g_Pipeline_Objects.g_Device,
-                                                             D3D12_COMMAND_LIST_TYPE_DIRECT);
+    g_Pipeline_Objects.g_CommandQueue_DIRECT = Create_Command_Queue(g_Pipeline_Objects.g_Device,
+                                                                    D3D12_COMMAND_LIST_TYPE_DIRECT);
 
 
     g_Pipeline_Objects.g_SwapChain = Create_Swap_Chain(
         Get_Parent_Window_HWND(),
-        g_Pipeline_Objects.g_CommandQueue,
+        g_Pipeline_Objects.g_CommandQueue_DIRECT->Get_D3D12_Command_Queue(),
         g_Pipeline_Objects.g_FrameBufferWidth,
         g_Pipeline_Objects.g_FrameBufferHeight);
 
@@ -734,7 +735,7 @@ void ENGINE::GRAPHICS::DaVinci::Flush(ComPtr<ID3D12CommandQueue> commandQueue, C
                                       uint64_t& fenceValue, HANDLE fenceEvent)
 {
     uint64_t fenceValueForSignal = Signal(commandQueue, fence, fenceValue);
-    
+
     Wait_For_Fence_Value(fence, fenceValueForSignal, fenceEvent);
 }
 
@@ -830,7 +831,8 @@ void ENGINE::GRAPHICS::DaVinci::Render()
 
         };
 
-        g_Pipeline_Objects.g_CommandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+        //g_Pipeline_Objects.g_CommandQueue_DIRECT->ExecuteCommandLists(_countof(commandLists), commandLists);
+        g_Pipeline_Objects.g_CommandQueue_DIRECT->Execute_Command_List(commandLists);
 
         UINT syncInterval = Render_Settings::Display_Settings::g_VSync ? 1 : 0;
 
@@ -848,7 +850,8 @@ void ENGINE::GRAPHICS::DaVinci::Render()
         }
 
         g_Pipeline_Objects.g_FrameFenceValues[g_Pipeline_Objects.g_CurrentBackBufferIndex]
-            = Signal(g_Pipeline_Objects.g_CommandQueue, g_Pipeline_Objects.g_Fence, g_Pipeline_Objects.g_FenceValue);
+            = Signal(g_Pipeline_Objects.g_CommandQueue_DIRECT->Get_D3D12_Command_Queue(), g_Pipeline_Objects.g_Fence,
+                     g_Pipeline_Objects.g_FenceValue);
 
         g_Pipeline_Objects.g_CurrentBackBufferIndex = g_Pipeline_Objects.g_SwapChain->GetCurrentBackBufferIndex();
 
@@ -856,6 +859,39 @@ void ENGINE::GRAPHICS::DaVinci::Render()
                              g_Pipeline_Objects.g_FrameFenceValues[g_Pipeline_Objects.g_CurrentBackBufferIndex],
                              g_Pipeline_Objects.g_FenceEvent);
     }
+}
+
+
+void ENGINE::GRAPHICS::DaVinci::Render(D3D12_VERTEX_BUFFER_VIEW* p_VertexBufferView,
+                                       D3D12_INDEX_BUFFER_VIEW* p_IndexBufferView)
+{
+    auto command_queue = Get_Command_Queue();
+    auto command_list = command_queue->Get_Command_List();
+    auto current_back_buffer_index = g_Pipeline_Objects.g_CurrentBackBufferIndex;
+    auto back_buffer = g_Pipeline_Objects.g_BackBuffers[current_back_buffer_index];
+    auto rtv = Get_Current_Render_Target_View();
+    auto dsv = Depth_Stencil_View_Heap->GetCPUDescriptorHandleForHeapStart();
+
+    {
+        transition_resource(
+            command_list,
+            back_buffer,
+            D3D12_RESOURCE_STATE_PRESENT,
+            D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+        clear_rtv(command_list, rtv, g_Pipeline_Objects.clear_colour);
+        clear_depth(command_list, dsv);
+    }
+
+    command_list->SetPipelineState(Pipeline_State.Get());
+    command_list->SetGraphicsRootSignature(Root_Signature.Get());
+
+    command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    command_list->IASetVertexBuffers(0, 1, p_VertexBufferView);
+    command_list->IASetIndexBuffer(p_IndexBufferView);
+
+    command_list->RSSetViewports(1, &g_Pipeline_Objects.g_Viewport);
+    command_list->RSSetScissorRects()
 }
 
 void ENGINE::GRAPHICS::DaVinci::Resize()
@@ -870,10 +906,13 @@ void ENGINE::GRAPHICS::DaVinci::Resize()
         // Don't allow 0 size swap chain back buffers.
         g_Pipeline_Objects.g_FrameBufferWidth = std::max(1, current_width);
         g_Pipeline_Objects.g_FrameBufferWidth = std::max(1, current_height);
+        g_Pipeline_Objects.g_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f,
+                                                         static_cast<float>(current_width),
+                                                         static_cast<float>(current_height));
 
         // Flush the GPU queue to make sure the swap chain's back buffers
         // are not being referenced by an in-flight command list.
-        Flush(g_Pipeline_Objects.g_CommandQueue,
+        Flush(g_Pipeline_Objects.g_CommandQueue_DIRECT->Get_D3D12_Command_Queue(),
               g_Pipeline_Objects.g_Fence,
               g_Pipeline_Objects.g_FenceValue,
               g_Pipeline_Objects.g_FenceEvent);
@@ -910,9 +949,9 @@ void ENGINE::GRAPHICS::DaVinci::Resize()
         Update_Render_Target_Views(g_Pipeline_Objects.g_Device,
                                    g_Pipeline_Objects.g_SwapChain,
                                    g_Pipeline_Objects.g_RTVDescriptorHeap);
-    }
 
-    Info(std::format("Window Resized to {}px, {}px", current_width, current_height));
+        Info(std::format("Window Resized to {}px, {}px", current_width, current_height));
+    }
 }
 
 
@@ -961,9 +1000,27 @@ ComPtr<ID3D12Device2> ENGINE::GRAPHICS::DaVinci::Get_Active_Device() const
 }
 
 
-ComPtr<ID3D12CommandQueue> ENGINE::GRAPHICS::DaVinci::Get_Active_CommandQueue() const
+ComPtr<CommandQueue> ENGINE::GRAPHICS::DaVinci::Get_Command_Queue(D3D12_COMMAND_LIST_TYPE command_type) const
 {
-    return g_Pipeline_Objects.g_CommandQueue;
+    ComPtr<CommandQueue> commandQueue;
+    switch (command_type)
+    {
+    case D3D12_COMMAND_LIST_TYPE_DIRECT:
+        commandQueue = g_Pipeline_Objects.g_CommandQueue_DIRECT;
+        break;
+    case D3D12_COMMAND_LIST_TYPE_COMPUTE:
+        commandQueue = g_Pipeline_Objects.g_CommandQueue_COMPUTE;
+        break;
+    case D3D12_COMMAND_LIST_TYPE_COPY:
+        commandQueue = g_Pipeline_Objects.g_CommandQueue_COPY;
+        break;
+    default:
+        CRITICAL(
+            "HOW THE HELL WERE WE GIVEN AN INVALID COMMAND TYPE? ERROR AT ENGINE::GRAPHICS::DaVinci::Get_Command_Queue()");
+        assert(false && "Invalid command queue type.");
+    }
+
+    return commandQueue;
 }
 
 
@@ -978,7 +1035,6 @@ DXGI_FORMAT ENGINE::GRAPHICS::DaVinci::Get_RTV_Frame_Buffer_Format() const
     return g_Pipeline_Objects.g_frameBufferFormat;
 }
 
-
 bool ENGINE::GRAPHICS::DaVinci::Update_Buffer_Resource(ComPtr<ID3D12GraphicsCommandList2> commandList,
                                                        ID3D12Resource** pDestinationResource,
                                                        ID3D12Resource** pIntermediateResource,
@@ -988,11 +1044,14 @@ bool ENGINE::GRAPHICS::DaVinci::Update_Buffer_Resource(ComPtr<ID3D12GraphicsComm
                                                        D3D12_RESOURCE_FLAGS flags)
 {
     size_t bufferSize = numElements * elementSize;
+    auto heap_properties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+    auto resource_desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize, flags);
+
     // Create a committed resource for the GPU resource in a default heap.
     if (FAILED(g_Pipeline_Objects.g_Device->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+        &heap_properties,
         D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Buffer(bufferSize, flags),
+        &resource_desc,
         D3D12_RESOURCE_STATE_COMMON,
         nullptr,
         IID_PPV_ARGS(pDestinationResource))))
@@ -1002,88 +1061,72 @@ bool ENGINE::GRAPHICS::DaVinci::Update_Buffer_Resource(ComPtr<ID3D12GraphicsComm
     }
 
     // Create a committed resource for the upload.
-
     // TODO: It's 1am as I write this... I am delirious and this must be re-learnt
     if (bufferData)
     {
+        auto heap_properties_upload = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+
         if (FAILED(g_Pipeline_Objects.g_Device->CreateCommittedResource(
-            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+            &heap_properties_upload,
             D3D12_HEAP_FLAG_NONE,
-            &CD3DX12_RESOURCE_DESC::Buffer(bufferSize),
+            &resource_desc,
             D3D12_RESOURCE_STATE_GENERIC_READ,
             nullptr,
             IID_PPV_ARGS(pIntermediateResource))))
         {
             Error(
                 "We MADE the resource, but we cant upload it... shit, CreateCommittedResource() in Update_Buffer_Resource(0 is to blame");
-
-            D3D12_SUBRESOURCE_DATA subresourceData = {};
-            subresourceData.pData = bufferData;
-            subresourceData.RowPitch = bufferSize;
-            subresourceData.SlicePitch = subresourceData.RowPitch;
-
-            UpdateSubresources(commandList.Get(),
-                               *pDestinationResource,
-                               *pIntermediateResource,
-                               0,
-                               0,
-                               1,
-                               &subresourceData);
+            return false;
         }
+
+        D3D12_SUBRESOURCE_DATA subresourceData = {};
+        subresourceData.pData = bufferData;
+        subresourceData.RowPitch = bufferSize;
+        subresourceData.SlicePitch = subresourceData.RowPitch;
+
+        UpdateSubresources(commandList.Get(),
+                           *pDestinationResource,
+                           *pIntermediateResource,
+                           0,
+                           0,
+                           1,
+                           &subresourceData);
+        return true;
     }
+    else
+    {
+        return false;
+    }
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE ENGINE::GRAPHICS::DaVinci::Get_Current_Render_Target_View() const
+{
+    return CD3DX12_CPU_DESCRIPTOR_HANDLE(
+        g_Pipeline_Objects.g_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+        g_Pipeline_Objects.g_CurrentBackBufferIndex,
+        g_Pipeline_Objects.g_RTVDescriptorSize);
 }
 
 
 void ENGINE::GRAPHICS::DaVinci::transition_resource(ComPtr<ID3D12GraphicsCommandList2> commandList,
-                                                    ComPtr<ID3D12Resource> resource,
-                                                    D3D12_RESOURCE_STATES beforeState,
+                                                    ComPtr<ID3D12Resource> resource, D3D12_RESOURCE_STATES beforeState,
                                                     D3D12_RESOURCE_STATES afterState)
 {
+    CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        resource.Get(),
+        beforeState, afterState);
+
+    commandList->ResourceBarrier(1, &barrier);
 }
 
-void ENGINE::GRAPHICS::DaVinci::Resize_Depth_Buffer(int width, int height)
+void ENGINE::GRAPHICS::DaVinci::clear_rtv(ComPtr<ID3D12GraphicsCommandList2> commandList,
+                                          D3D12_CPU_DESCRIPTOR_HANDLE rtv, FLOAT* clearColor)
 {
-
+    commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 }
 
-
-
-
+void ENGINE::GRAPHICS::DaVinci::clear_depth(ComPtr<ID3D12GraphicsCommandList2> commandList,
+                                            D3D12_CPU_DESCRIPTOR_HANDLE dsv, FLOAT depth)
 {
-    if (m_ContentLoaded)
-    {
-        // Flush any GPU commands that might be referencing the depth buffer.
-        Application::Get().Flush();
-
-        width = std::max(1, width);
-        height = std::max(1, height);
-
-        auto device = Application::Get().GetDevice();
-
-        // Resize screen dependent resources.
-        // Create a depth buffer.
-        D3D12_CLEAR_VALUE optimizedClearValue = {};
-        optimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
-        optimizedClearValue.DepthStencil = { 1.0f, 0 };
-
-        ThrowIfFailed(device->CreateCommittedResource(
-            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-            D3D12_HEAP_FLAG_NONE,
-            &CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, width, height,
-                1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
-            D3D12_RESOURCE_STATE_DEPTH_WRITE,
-            &optimizedClearValue,
-            IID_PPV_ARGS(&m_DepthBuffer)
-        ));
-
-        // Update the depth-stencil view.
-        D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
-        dsv.Format = DXGI_FORMAT_D32_FLOAT;
-        dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-        dsv.Texture2D.MipSlice = 0;
-        dsv.Flags = D3D12_DSV_FLAG_NONE;
-
-        device->CreateDepthStencilView(m_DepthBuffer.Get(), &dsv,
-            m_DSVHeap->GetCPUDescriptorHandleForHeapStart());
-    }
+    commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, depth, 0, 0, nullptr);
 }

@@ -1,7 +1,11 @@
 // ReSharper disable CppInconsistentNaming
 #pragma once
 
+
+#include "../Src/CommandQueue.hpp"
+
 #include "BaseModule.hpp"
+#include "CommandQueue.hpp"
 #define WIN32_LEAN_AND_MEAN 
 
 #include <windows.h>
@@ -38,9 +42,9 @@ namespace ENGINE::GRAPHICS
     {
         float m_FoV;
 
-        DirectX::XMMATRIX m_ModelMatrix;
-        DirectX::XMMATRIX m_ViewMatrix;
-        DirectX::XMMATRIX m_ProjectionMatrix;
+        DirectX::XMVECTOR eye_position;
+        DirectX::XMVECTOR eye_focus_point;
+        DirectX::XMVECTOR eye_up_direction;
     };
 
 
@@ -268,7 +272,8 @@ namespace ENGINE::GRAPHICS
 
         // At the moment we ONLY 1: Clear back buffer; 2: Present Rendered Frame
         void Render();
-
+        void Render(D3D12_VERTEX_BUFFER_VIEW* p_VertexBufferView, D3D12_INDEX_BUFFER_VIEW* p_IndexBufferView);
+        
 
         // This should be triggered by Check_For_Events()
         void Resize();
@@ -306,14 +311,24 @@ namespace ENGINE::GRAPHICS
         void Set_Clear_Colour(float red, float green, float blue, float alpha);
 
 
+        // Get current Active DirectX Device / GPU for allocations and that fun stuff
         ComPtr<ID3D12Device2> Get_Active_Device() const;
 
-        ComPtr<ID3D12CommandQueue> Get_Active_CommandQueue() const;
+        
+        /// Let's make ourselves a Command Queue... a series of Command-Lists
+        /// @param command_type Is it a Copy? a Compute? or Option C.) "All of the above + extra" DIRECT 
+        ComPtr<CommandQueue> Get_Command_Queue(D3D12_COMMAND_LIST_TYPE command_type = D3D12_COMMAND_LIST_TYPE_DIRECT) const;
 
+        
+        // Are we Double or Triple Buffering? or QUADRUPLE buffering :O
         int Get_Number_of_Frames_In_Flight() const;
 
+        
+        // How are our frames formated? By default, we're 8-bit float for RGBA
         DXGI_FORMAT Get_RTV_Frame_Buffer_Format() const;
 
+        
+        // How is our Depth Stencil View formatted? By default it's set to Unknown... I think
         DXGI_FORMAT Get_Depth_Stencil_View_Frame_Buffer_Format() const;
 
 
@@ -344,17 +359,16 @@ namespace ENGINE::GRAPHICS
             ComPtr<ID3D12GraphicsCommandList2> commandList,
             ID3D12Resource** pDestinationResource,
             ID3D12Resource** pIntermediateResource,
-            size_t numElements, size_t elementSize, const void* bufferData,
-            D3D12_RESOURCE_FLAGS flags);
+            size_t numElements, 
+            size_t elementSize, 
+            const void* bufferData,
+            D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE );
 
         
-        
-        void Resize_Depth_Buffer(int width, int height);
-        
+        D3D12_CPU_DESCRIPTOR_HANDLE Get_Current_Render_Target_View() const;
         
         
         
-        Camera Primary_Camera = {45.0f};
 
         
     private:
@@ -455,7 +469,9 @@ namespace ENGINE::GRAPHICS
 
             ComPtr<ID3D12Device2> g_Device;
             ComPtr<ID3D12Debug> g_DebugInterface;
-            ComPtr<ID3D12CommandQueue> g_CommandQueue;
+            ComPtr<CommandQueue> g_CommandQueue_DIRECT;
+            ComPtr<CommandQueue> g_CommandQueue_COMPUTE;
+            ComPtr<CommandQueue> g_CommandQueue_COPY;
             ComPtr<IDXGISwapChain4> g_SwapChain;
             ComPtr<ID3D12Resource> g_BackBuffers[frames_in_flight];
             ComPtr<ID3D12GraphicsCommandList> g_CommandList;
@@ -463,6 +479,9 @@ namespace ENGINE::GRAPHICS
             ComPtr<ID3D12DescriptorHeap> g_RTVDescriptorHeap;
             UINT g_RTVDescriptorSize;
             UINT g_CurrentBackBufferIndex;
+            
+            D3D12_VIEWPORT g_Viewport;
+            CD3DX12_RECT g_ScissorRect;
         };
 
         Pipeline_Objects g_Pipeline_Objects;

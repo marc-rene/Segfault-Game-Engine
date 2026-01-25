@@ -1,5 +1,7 @@
 ﻿#include "CommandQueue.hpp"
 
+#include "../Include/DaVinci.hpp"
+
 
 inline void ThrowIfFailed(HRESULT hr, std::string p_message = "")
 {
@@ -113,6 +115,37 @@ uint64_t CommandQueue::Execute_Command_List(Microsoft::WRL::ComPtr<ID3D12Graphic
     return fenceValue;
 }
 
+uint64_t CommandQueue::Signal()
+{
+    uint64_t fenceValue = ++m_fence_value;
+    m_d3d12_command_queue->Signal(m_d3d12_fence.Get(), fenceValue);
+    return fenceValue;
+}
+
+
+bool CommandQueue::Is_Fence_Complete(uint64_t fenceValue)
+{
+    return m_d3d12_fence->GetCompletedValue() >= fenceValue;
+}
+
+void CommandQueue::Wait_For_Fence_Value(uint64_t fenceValue)
+{
+    if (!Is_Fence_Complete(fenceValue))
+    {
+        m_d3d12_fence->SetEventOnCompletion(fenceValue, m_fence_event);
+        ::WaitForSingleObject(m_fence_event, DWORD_MAX);
+    }
+}
+
+void CommandQueue::Flush()
+{
+    Wait_For_Fence_Value(Signal());
+}
+
+ComPtr<ID3D12CommandQueue> CommandQueue::Get_D3D12_Command_Queue() const
+{
+    return m_d3d12_command_queue;
+}
 
 ComPtr<ID3D12CommandAllocator> CommandQueue::create_command_allocator()
 {
