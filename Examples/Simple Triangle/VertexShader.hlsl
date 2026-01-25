@@ -1,4 +1,4 @@
-﻿struct ModelViewProjection
+struct ModelViewProjection
 {
     matrix MVP;
 };

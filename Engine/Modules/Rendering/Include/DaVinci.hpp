@@ -34,6 +34,16 @@ using namespace Microsoft::WRL;
 
 namespace ENGINE::GRAPHICS
 {
+    struct Camera
+    {
+        float m_FoV;
+
+        DirectX::XMMATRIX m_ModelMatrix;
+        DirectX::XMMATRIX m_ViewMatrix;
+        DirectX::XMMATRIX m_ProjectionMatrix;
+    };
+
+
     struct DaVinci : ENGINE_MODULE_INTERFACE
     {
     public:
@@ -306,6 +316,47 @@ namespace ENGINE::GRAPHICS
 
         DXGI_FORMAT Get_Depth_Stencil_View_Frame_Buffer_Format() const;
 
+
+        // Depth buffer.
+        ComPtr<ID3D12Resource> Depth_Buffer;
+
+        // Descriptor heap for depth buffer.
+        ComPtr<ID3D12DescriptorHeap> Depth_Stencil_View_Heap;
+
+        // Root signature
+        ComPtr<ID3D12RootSignature> Root_Signature;
+
+        // Pipeline state object.
+        ComPtr<ID3D12PipelineState> Pipeline_State;
+
+        /// We need to be able to make a "Resource" that can hold all vertex/indicies data
+        /// until it can get sent to the GPU
+        /// TODO: Make better comment for this
+        /// @param commandList required to transfer the buffer data to the destination resource
+        /// @param pDestinationResource  pointer to the destination resources created from this method 
+        /// @param pIntermediateResource  pointer to the intermediate resources created from this method
+        /// @param numElements the CPU buffer data that is transferred to the GPU resource
+        /// @param elementSize the CPU buffer data that is transferred to the GPU resource
+        /// @param bufferData the CPU buffer data that is transferred to the GPU resource
+        /// @param flags Any extra flags that are needed before we render this?
+        /// @return Success?
+        bool Update_Buffer_Resource(
+            ComPtr<ID3D12GraphicsCommandList2> commandList,
+            ID3D12Resource** pDestinationResource,
+            ID3D12Resource** pIntermediateResource,
+            size_t numElements, size_t elementSize, const void* bufferData,
+            D3D12_RESOURCE_FLAGS flags);
+
+        
+        
+        void Resize_Depth_Buffer(int width, int height);
+        
+        
+        
+        
+        Camera Primary_Camera = {45.0f};
+
+        
     private:
         inline static DaVinci* self_ptr;
 

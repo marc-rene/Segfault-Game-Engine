@@ -6,6 +6,8 @@
 #include <SDL3/SDL_init.h>
 #include "SDL3/SDL_video.h"
 
+using namespace DirectX;
+
 
 ENGINE::GRAPHICS::DaVinci::DaVinci() : ENGINE_MODULE_INTERFACE("DaVinci")
 {
@@ -732,7 +734,7 @@ void ENGINE::GRAPHICS::DaVinci::Flush(ComPtr<ID3D12CommandQueue> commandQueue, C
                                       uint64_t& fenceValue, HANDLE fenceEvent)
 {
     uint64_t fenceValueForSignal = Signal(commandQueue, fence, fenceValue);
-
+    
     Wait_For_Fence_Value(fence, fenceValueForSignal, fenceEvent);
 }
 
@@ -977,10 +979,111 @@ DXGI_FORMAT ENGINE::GRAPHICS::DaVinci::Get_RTV_Frame_Buffer_Format() const
 }
 
 
+bool ENGINE::GRAPHICS::DaVinci::Update_Buffer_Resource(ComPtr<ID3D12GraphicsCommandList2> commandList,
+                                                       ID3D12Resource** pDestinationResource,
+                                                       ID3D12Resource** pIntermediateResource,
+                                                       size_t numElements,
+                                                       size_t elementSize,
+                                                       const void* bufferData,
+                                                       D3D12_RESOURCE_FLAGS flags)
+{
+    size_t bufferSize = numElements * elementSize;
+    // Create a committed resource for the GPU resource in a default heap.
+    if (FAILED(g_Pipeline_Objects.g_Device->CreateCommittedResource(
+        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+        D3D12_HEAP_FLAG_NONE,
+        &CD3DX12_RESOURCE_DESC::Buffer(bufferSize, flags),
+        D3D12_RESOURCE_STATE_COMMON,
+        nullptr,
+        IID_PPV_ARGS(pDestinationResource))))
+    {
+        Error("Hey! Update_Buffer_Resource() failed to create a GPU resource in committed memory");
+        return false;
+    }
+
+    // Create a committed resource for the upload.
+
+    // TODO: It's 1am as I write this... I am delirious and this must be re-learnt
+    if (bufferData)
+    {
+        if (FAILED(g_Pipeline_Objects.g_Device->CreateCommittedResource(
+            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+            D3D12_HEAP_FLAG_NONE,
+            &CD3DX12_RESOURCE_DESC::Buffer(bufferSize),
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS(pIntermediateResource))))
+        {
+            Error(
+                "We MADE the resource, but we cant upload it... shit, CreateCommittedResource() in Update_Buffer_Resource(0 is to blame");
+
+            D3D12_SUBRESOURCE_DATA subresourceData = {};
+            subresourceData.pData = bufferData;
+            subresourceData.RowPitch = bufferSize;
+            subresourceData.SlicePitch = subresourceData.RowPitch;
+
+            UpdateSubresources(commandList.Get(),
+                               *pDestinationResource,
+                               *pIntermediateResource,
+                               0,
+                               0,
+                               1,
+                               &subresourceData);
+        }
+    }
+}
+
+
 void ENGINE::GRAPHICS::DaVinci::transition_resource(ComPtr<ID3D12GraphicsCommandList2> commandList,
                                                     ComPtr<ID3D12Resource> resource,
                                                     D3D12_RESOURCE_STATES beforeState,
                                                     D3D12_RESOURCE_STATES afterState)
 {
-    
+}
+
+void ENGINE::GRAPHICS::DaVinci::Resize_Depth_Buffer(int width, int height)
+{
+
+}
+
+
+
+
+{
+    if (m_ContentLoaded)
+    {
+        // Flush any GPU commands that might be referencing the depth buffer.
+        Application::Get().Flush();
+
+        width = std::max(1, width);
+        height = std::max(1, height);
+
+        auto device = Application::Get().GetDevice();
+
+        // Resize screen dependent resources.
+        // Create a depth buffer.
+        D3D12_CLEAR_VALUE optimizedClearValue = {};
+        optimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+        optimizedClearValue.DepthStencil = { 1.0f, 0 };
+
+        ThrowIfFailed(device->CreateCommittedResource(
+            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+            D3D12_HEAP_FLAG_NONE,
+            &CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, width, height,
+                1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+            D3D12_RESOURCE_STATE_DEPTH_WRITE,
+            &optimizedClearValue,
+            IID_PPV_ARGS(&m_DepthBuffer)
+        ));
+
+        // Update the depth-stencil view.
+        D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
+        dsv.Format = DXGI_FORMAT_D32_FLOAT;
+        dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+        dsv.Texture2D.MipSlice = 0;
+        dsv.Flags = D3D12_DSV_FLAG_NONE;
+
+        device->CreateDepthStencilView(m_DepthBuffer.Get(), &dsv,
+            m_DSVHeap->GetCPUDescriptorHandleForHeapStart());
+    }
 }
