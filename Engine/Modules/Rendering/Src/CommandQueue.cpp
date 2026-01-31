@@ -42,6 +42,12 @@ CommandQueue::CommandQueue(ComPtr<ID3D12Device2> dx_device, D3D12_COMMAND_LIST_T
     assert(m_fence_event && "Failed to create fence event handle.");
 }
 
+CommandQueue::~CommandQueue()
+{
+    m_d3d12_command_queue->Release();
+
+}
+
 
 ComPtr<ID3D12GraphicsCommandList2> CommandQueue::Get_Command_List()
 {

@@ -157,6 +157,6 @@ group "Examples"
 
         dependson { "ApocalypseRuntime", "imgui_sdl3_d3d", "SDL", "CoreModule" }
         links { "dxgi", "d3d12", "ApocalypseRuntime", "SDL", "CoreModule", "imgui_sdl3_d3d", "d3dcompiler"}
-
+        
     end)
 group ""

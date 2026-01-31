@@ -279,6 +279,7 @@ int main()
     ComPtr<ID3D12Resource> m_IndexBuffer;
     D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
 
+    load_mesh(&Runtime);
 
     
     // Update the model matrix.
@@ -295,7 +296,17 @@ int main()
     {
         Runtime.Pre_tick();
 
-        Runtime.Tick();
+        Runtime.Get_DaVinci_instance()->Update();
+        Runtime.Get_DaVinci_instance()->Render(
+            &Cube_VertexBufferView,
+            &Cube_IndexBufferView,
+            &m_ModelMatrix,
+            &m_ViewMatrix,
+            &m_ProjectionMatrix,
+            _countof(Cube_Indicies)
+            );
+        
+        
 
         Runtime.Post_tick();
         

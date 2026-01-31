@@ -51,7 +51,7 @@ bool ENGINE::EDITOR::Nitpick::Set_New_Host_DaVinci_Instance(GRAPHICS::DaVinci* n
 
     ImGui_ImplDX12_InitInfo init_info = {};
     init_info.Device = new_host_davinci->Get_Active_Device().Get();
-    init_info.CommandQueue = new_host_davinci->Get_Command_Queue().Get();
+    init_info.CommandQueue = new_host_davinci->Get_Command_Queue()->Get_D3D12_Command_Queue().Get();
     init_info.NumFramesInFlight = new_host_davinci->Get_Number_of_Frames_In_Flight();
     init_info.RTVFormat = new_host_davinci->Get_RTV_Frame_Buffer_Format();
     init_info.DSVFormat = DXGI_FORMAT_UNKNOWN;

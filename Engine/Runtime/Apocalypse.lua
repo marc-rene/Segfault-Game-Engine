@@ -15,7 +15,7 @@ project "ApocalypseRuntime"
         "%{wks.location}/Engine/Modules/Networking/Include",
         "%{wks.location}/Engine/Modules/Platform/Include",
         "%{wks.location}/Engine/Modules/Rendering/Include",
-        
+        "%{wks.location}/Engine/ThirdParty/DirectX_Headers/include/directx",
         --TODO: make the Core a static lib or dll to import instead of including all folders 
         "%{wks.location}/Engine/ThirdParty/Spdlog/include",
     }

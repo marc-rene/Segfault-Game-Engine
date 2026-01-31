@@ -21,6 +21,7 @@ struct CommandQueue
     virtual ~CommandQueue();
 
 
+
     // Get an available command list from the command queue.
     ComPtr<ID3D12GraphicsCommandList2> Get_Command_List();
 

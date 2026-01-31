@@ -61,7 +61,7 @@ bool ENGINE::GRAPHICS::DaVinci::New_Parent_Window(std::string name, int w, int h
     g_Pipeline_Objects.g_FrameBufferHeight = h;
     g_Pipeline_Objects.g_Viewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
     g_Pipeline_Objects.g_ScissorRect = CD3DX12_RECT(0, 0, LONG_MAX, LONG_MAX);
-    
+
     ComPtr<IDXGIAdapter4> dxgiAdapter4 = Get_Best_Graphics_Adapter();
 
 
@@ -471,10 +471,10 @@ Microsoft::WRL::ComPtr<ID3D12Device2> ENGINE::GRAPHICS::DaVinci::Create_Device(
 }
 
 
-Microsoft::WRL::ComPtr<ID3D12CommandQueue> ENGINE::GRAPHICS::DaVinci::Create_Command_Queue(ComPtr<ID3D12Device2> device,
+std::shared_ptr<CommandQueue> ENGINE::GRAPHICS::DaVinci::Create_Command_Queue(ComPtr<ID3D12Device2> device,
     D3D12_COMMAND_LIST_TYPE type)
 {
-    ComPtr<ID3D12CommandQueue> d3d12CommandQueue;
+    std::shared_ptr<CommandQueue> d3d12CommandQueue;
 
     D3D12_COMMAND_QUEUE_DESC desc = {};
     desc.Type = type; // Copy?    Compute? (Compute can Copy)    Direct? (Does everything)
@@ -482,7 +482,7 @@ Microsoft::WRL::ComPtr<ID3D12CommandQueue> ENGINE::GRAPHICS::DaVinci::Create_Com
     desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     desc.NodeMask = 0; // What GPU do we want to use? GPU #1 or GPU #2 or GPU #0, etc...
 
-    HRESULT command_queue_success = device->CreateCommandQueue(&desc, IID_PPV_ARGS(&d3d12CommandQueue));
+    HRESULT command_queue_success = device->CreateCommandQueue(&desc, IID_PPV_ARGS(&d3d12CommandQueue->Get_D3D12_Command_Queue()));
     if (FAILED(command_queue_success))
     {
         Error("WE MESSED UP MAKING THE COMMAND QUEUE! HOW?");
@@ -773,6 +773,7 @@ void ENGINE::GRAPHICS::DaVinci::Update()
 
 void ENGINE::GRAPHICS::DaVinci::Render()
 {
+    /*
     // Before any commands can be recorded into the command list, 
     // the command allocator and command list needs to be reset to its initial state
     auto commandAllocator = g_Pipeline_Objects.g_CommandAllocators[g_Pipeline_Objects.g_CurrentBackBufferIndex];
@@ -859,11 +860,17 @@ void ENGINE::GRAPHICS::DaVinci::Render()
                              g_Pipeline_Objects.g_FrameFenceValues[g_Pipeline_Objects.g_CurrentBackBufferIndex],
                              g_Pipeline_Objects.g_FenceEvent);
     }
+    */
 }
 
 
 void ENGINE::GRAPHICS::DaVinci::Render(D3D12_VERTEX_BUFFER_VIEW* p_VertexBufferView,
-                                       D3D12_INDEX_BUFFER_VIEW* p_IndexBufferView)
+                                       D3D12_INDEX_BUFFER_VIEW* p_IndexBufferView,
+                                       XMMATRIX* p_ModelMatrix,
+                                       XMMATRIX* p_ViewMatrix,
+                                       XMMATRIX* p_projectionMatrix,
+                                       int indicies_size
+                                       )
 {
     auto command_queue = Get_Command_Queue();
     auto command_list = command_queue->Get_Command_List();
@@ -891,7 +898,37 @@ void ENGINE::GRAPHICS::DaVinci::Render(D3D12_VERTEX_BUFFER_VIEW* p_VertexBufferV
     command_list->IASetIndexBuffer(p_IndexBufferView);
 
     command_list->RSSetViewports(1, &g_Pipeline_Objects.g_Viewport);
-    command_list->RSSetScissorRects()
+    command_list->RSSetScissorRects(1, &g_Pipeline_Objects.g_ScissorRect);
+
+    command_list->OMSetRenderTargets(1,
+                                     &rtv,
+                                     FALSE,
+                                     &dsv);
+    
+    // Update the MVP matrix
+    XMMATRIX mvpMatrix = XMMatrixMultiply(*p_ModelMatrix, *p_ViewMatrix);
+    mvpMatrix = XMMatrixMultiply(mvpMatrix, *p_projectionMatrix);
+    command_list->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / 4, &mvpMatrix, 0);
+
+    command_list->DrawIndexedInstanced(indicies_size, 1, 0, 0, 0);
+
+    // Present
+    {
+        transition_resource(
+            command_list, 
+            back_buffer,
+            D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+
+        g_Pipeline_Objects.g_FrameFenceValues[g_Pipeline_Objects.g_CurrentBackBufferIndex] = 
+            command_queue->Execute_Command_List(command_list);
+
+        UINT syncInterval = Render_Settings::Display_Settings::g_VSync ? 1 : 0;
+        UINT presentFlags = Render_Settings::Display_Settings::g_VariableRefreshRate && !Render_Settings::Display_Settings::g_VSync ? DXGI_PRESENT_ALLOW_TEARING : 0;
+        g_Pipeline_Objects.g_SwapChain->Present(syncInterval, presentFlags);
+        g_Pipeline_Objects.g_CurrentBackBufferIndex = g_Pipeline_Objects.g_SwapChain->GetCurrentBackBufferIndex();
+
+        command_queue->Wait_For_Fence_Value(g_Pipeline_Objects.g_FrameFenceValues[g_Pipeline_Objects.g_CurrentBackBufferIndex]);
+    }
 }
 
 void ENGINE::GRAPHICS::DaVinci::Resize()
@@ -1000,9 +1037,9 @@ ComPtr<ID3D12Device2> ENGINE::GRAPHICS::DaVinci::Get_Active_Device() const
 }
 
 
-ComPtr<CommandQueue> ENGINE::GRAPHICS::DaVinci::Get_Command_Queue(D3D12_COMMAND_LIST_TYPE command_type) const
+std::shared_ptr<CommandQueue> ENGINE::GRAPHICS::DaVinci::Get_Command_Queue(D3D12_COMMAND_LIST_TYPE command_type) const
 {
-    ComPtr<CommandQueue> commandQueue;
+    std::shared_ptr<CommandQueue> commandQueue;
     switch (command_type)
     {
     case D3D12_COMMAND_LIST_TYPE_DIRECT:

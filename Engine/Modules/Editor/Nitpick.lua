@@ -10,6 +10,7 @@ group "Modules"
         {
             "%{wks.location}/Engine/Modules/Core/Include",
             "%{wks.location}/Engine/Modules/Rendering/Include",
+            "%{wks.location}/Engine/ThirdParty/DirectX_Headers/include/directx",
             "%{wks.location}/Engine/ThirdParty/ImGui",
         }
         
