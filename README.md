@@ -11,11 +11,13 @@ The name alone should be a clue!
 ## Install
 1. Ensure you have [Python 3](https://www.python.org/) installed on your system, all testing has only been done on Windows. Linux Support is en route!
 
-2. To get started, first clone this repo using `git clone --recursive https://github.com/marc-rene/Segfault-Game-Engine.git` - Please don't forget that `--recursive` tag
+2. Make sure you have [CMake](https://cmake.org/download/) installed on your system.
+   
+3. To get started, first clone this repo using `git clone --recursive https://github.com/marc-rene/Segfault-Game-Engine.git` - Please don't forget that `--recursive` tag
 
-3. Assuming you're on Windows, open the newly clone repo and run `/Generate Solution.bat` located in the root folder. This is a Windows script that will simply run the `Setup/Setup.py`. If you're on Linux you may need to edit the `Setup/Setup.py` file so that it'll look for a Linux binary of Premake5.
+4. Assuming you're on Windows, open the newly clone repo and run `/Generate Solution.bat` located in the root folder. This is a Windows script that will simply run the `Setup/Setup.py`. If you're on Linux you may need to edit the `Setup/Setup.py` file so that it'll look for a Linux binary of Premake5.
 
-4. Once you've run the script, either by running `/Generate Solution.bat` or running `Setup/Setup.py` directly, a `Segfault.sln` should appear in your root folder. I recommend [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) if you want to compile the example .hlsl shader files. [Rider](https://www.jetbrains.com/rider/download/?section=windows) is also very good! I recommend running the example projects first to ensure all compile's well! So far, Only `Simple Window` and `Simple Triangle` are working as of writing this.
+5. Once you've run the script, either by running `/Generate Solution.bat` or running `Setup/Setup.py` directly, a `Segfault.sln` should appear in your root folder. I recommend [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) if you want to compile the example .hlsl shader files. [Rider](https://www.jetbrains.com/rider/download/?section=windows) is also very good! I recommend running the example projects first to ensure all compile's well! So far, Only `Simple Window` and `Simple Triangle` are working as of writing this.
 
 
 ## About
