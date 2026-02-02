@@ -1,11 +1,16 @@
 #include "../Include/DaVinci.hpp"
 #include "../Include/DaVinci.hpp"
 
+#include <Windows.h>
 #include <d3dx12.h>
+#include <d3d12.h>
+#include <dxgi1_6.h>
+
+
 
 #include <SDL3/SDL_init.h>
 #include "SDL3/SDL_video.h"
-
+/*
 using namespace DirectX;
 
 
@@ -860,9 +865,9 @@ void ENGINE::GRAPHICS::DaVinci::Render()
                              g_Pipeline_Objects.g_FrameFenceValues[g_Pipeline_Objects.g_CurrentBackBufferIndex],
                              g_Pipeline_Objects.g_FenceEvent);
     }
-    */
 }
-
+    */
+/*
 
 void ENGINE::GRAPHICS::DaVinci::Render(D3D12_VERTEX_BUFFER_VIEW* p_VertexBufferView,
                                        D3D12_INDEX_BUFFER_VIEW* p_IndexBufferView,
@@ -1167,3 +1172,4 @@ void ENGINE::GRAPHICS::DaVinci::clear_depth(ComPtr<ID3D12GraphicsCommandList2> c
 {
     commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, depth, 0, 0, nullptr);
 }
+*/

@@ -2,7 +2,7 @@
 
 #include "../Include/DaVinci.hpp"
 
-
+/*
 inline void ThrowIfFailed(HRESULT hr, std::string p_message = "")
 {
     if (FAILED(hr))
@@ -172,3 +172,4 @@ ComPtr<ID3D12GraphicsCommandList2> CommandQueue::create_command_list(ComPtr<ID3D
 
     return commandList;
 }
+*/

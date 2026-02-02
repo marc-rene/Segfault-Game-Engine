@@ -12,6 +12,7 @@ group "Modules"
             "%{wks.location}/Engine/Modules/Rendering/Include",
             "%{wks.location}/Engine/ThirdParty/DirectX_Headers/include/directx",
             "%{wks.location}/Engine/ThirdParty/ImGui",
+            "%{wks.location}/Engine/ThirdParty/NVRHI/include",
         }
         
         targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
@@ -19,7 +20,9 @@ group "Modules"
 
         dependson { "CoreModule", "DaVinci", "imgui_sdl3_d3d", "SDL" }
 
-        links { "CoreModule", "DaVinci" }
+        links { "CoreModule", "DaVinci",
+                --"nvrhi", "nvrhi_d3d11", "nvrhi_d3d12" 
+                }
         
 group ""
 

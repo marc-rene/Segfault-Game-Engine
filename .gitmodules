@@ -28,3 +28,6 @@
 [submodule "Engine/ThirdParty/DirectX_Headers"]
 	path = Engine/ThirdParty/DirectX_Headers
 	url = https://github.com/microsoft/DirectX-Headers.git
+[submodule "Engine/ThirdParty/NVRHI"]
+	path = Engine/ThirdParty/NVRHI
+	url = https://github.com/NVIDIA-RTX/NVRHI.git

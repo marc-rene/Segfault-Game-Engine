@@ -6,7 +6,7 @@
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_dx12.h"
 
-
+/*
 ENGINE::EDITOR::Nitpick::Nitpick() : ENGINE_MODULE_INTERFACE("Nit-Pick Editor")
 {
     // Setup Dear ImGui context
@@ -77,3 +77,4 @@ bool ENGINE::EDITOR::Nitpick::Set_New_Host_DaVinci_Instance(GRAPHICS::DaVinci* n
 
     return true;
 }
+*/

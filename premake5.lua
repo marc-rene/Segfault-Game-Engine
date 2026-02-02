@@ -14,7 +14,7 @@ workspace "Segfault"
 
     startproject "Sample Window"
 
-    -- For SDL because it only has debug and release:
+    -- For SDL and NVRHI because it only has debug and release:
     configmap {
         ["Dist"] = "Release",
     }
