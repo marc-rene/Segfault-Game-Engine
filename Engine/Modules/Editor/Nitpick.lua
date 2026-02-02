@@ -1,6 +1,6 @@
 group "Modules"
     project "NitPick"
-        kind "StaticLib" 
+        kind "SharedLib" 
         language "C++"
         cppdialect "C++23"
 
@@ -20,9 +20,7 @@ group "Modules"
 
         dependson { "CoreModule", "DaVinci", "imgui_sdl3_d3d", "SDL" }
 
-        links { "CoreModule", "DaVinci",
-                --"nvrhi", "nvrhi_d3d11", "nvrhi_d3d12" 
-                }
+        
         
 group ""
 

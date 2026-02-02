@@ -1,6 +1,6 @@
 group "Modules"
     project "DaVinci"
-        kind "StaticLib"
+        kind "SharedLib"
         language "C++"
         cppdialect "C++23"
 

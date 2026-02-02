@@ -1,5 +1,5 @@
 project "ApocalypseRuntime"
-    kind "StaticLib"
+    kind "SharedLib"
     language "C++"
     cppdialect "C++23"
     
@@ -25,10 +25,10 @@ project "ApocalypseRuntime"
     targetdir ("%{wks.location}/Lib/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
     objdir ("%{wks.location}/Lib/Intermediates/%{cfg.architecture}/%{cfg.buildcfg}/%{prj.name}")
     
-    links { 
-        "FileWizard",   "PacketNinja",  "DaftPunk",
-        "Swarm",        "DaVinci",      "NitPick",
-    } 
+    --links { 
+    --    "FileWizard",   "PacketNinja",  "DaftPunk",
+    --    "Swarm",        "DaVinci",      "NitPick",
+    --} 
 
     dependson { 
         "FileWizard",   "PacketNinja",  "DaftPunk",
