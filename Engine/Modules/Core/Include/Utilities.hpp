@@ -14,7 +14,7 @@
 constexpr unsigned long long hash(std::string_view string)
 {
     unsigned long long hash = 0;
-    for (char c : str)
+    for (char c : string)
     {
         hash = (hash * 131) + c;
     }

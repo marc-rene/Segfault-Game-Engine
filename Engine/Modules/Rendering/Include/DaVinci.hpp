@@ -60,7 +60,7 @@ namespace ENGINE::GRAPHICS
         /// Try to initialise our Device using either Vulkan (WIP), DirectX 11 (WIP), or DirectX 12... 
         /// @param Preferred_RHI What RHI would you like to use? Only DirectX 12 is supported for now
         /// @return Hopefully not false
-        bool Initialise_Render_Devices(E_DaVinci_RenderAPI Preferred_RHI = E_DaVinci_RenderAPI::DirectX_12);
+        bool Initialise_Render_Devices(E_DaVinci_RenderAPI Preferred_RHI = E_DaVinci_RenderAPI::RHI_DirectX_12);
 
 
         /// Make our swap chains, RTV's, Callbacks, Everything! Our Pipeline objects about to get full
