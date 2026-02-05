@@ -55,8 +55,7 @@ Makefile
 .vs/
 .idea/
 Binaries/
-SegFault Editor/Vendor/imgui/examples
-SegFault Editor/Vendor/SDL/examples
+Engine/ThirdParty/NVRHI/build
 
 # Exclude
 !Setup/Binaries
