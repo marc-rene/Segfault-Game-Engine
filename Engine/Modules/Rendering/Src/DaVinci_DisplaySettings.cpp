@@ -1,26 +1,42 @@
 ﻿#include "../Include/DaVinci.hpp"
+#include <utility>
 
-#define STRINGISE(x) L##x       // Do NOT use this
-#define WIDEN(x) STRINGISE(x)   // DO use this to make String a Wide string
+#include "../Include/DaVinci.hpp"
+
 
 namespace ENGINE::GRAPHICS
 {
-    struct DaVinci::Display_Settings
+    struct Display_Info
     {
-        std::wstring Window_Title       =   WIDEN(ENGINE_NAME);
-        
-        unsigned short Window_Height    =   600; 
-        unsigned short Window_Width     =   800;
-        
+        std::wstring Window_Title = TO_WIDE_STRING(ENGINE_NAME);
+
+        DaVinci_WindowDimensions Window_Size = {800, 600};
+
         // Fullscreen? Resizable? 
-        int Flags = 0;
+        DaVinci_WindowFlags Flags = 0;
+
         
-        Display_Settings()
+        
+        
+        
+        Display_Info()
         {
-            Window_Title =   WIDEN(ENGINE_NAME);
-            Window_Height =   600;
-            Window_Width =   800;
-            Flags;
+            Window_Title = TO_WIDE_STRING(ENGINE_NAME);
+            Window_Size[0] =  800;
+            Window_Size[1] =  600;
+            Flags = DAVINCI_WINDOW__RESIZABLE;
+        }
+        
+        Display_Info(   std::wstring new_window_title,   uInt_32 initial_width, 
+                        uInt_32 initial_height,         DaVinci_WindowFlags initial_flags) :
+        Window_Title(std::move(new_window_title)), 
+        Window_Size(initial_width, initial_height), 
+        Flags(initial_flags)
+        {
+            Window_Title = TO_WIDE_STRING(ENGINE_NAME);
+            Window_Size[0] =  800;
+            Window_Size[1] =  600;
+            Flags = DAVINCI_WINDOW__RESIZABLE;
         }
     };
 }

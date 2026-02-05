@@ -6,6 +6,14 @@ group "Modules"
 
         files { "%{prj.location}/**" }
         
+        defines
+        {
+            "DIRECTX_11_SUPPORT",
+            "DIRECTX_12_SUPPORT",
+            "VULKAN_SUPPORT",
+            --"WEBGPU_SUPPORT",
+        }
+        
         includedirs
         {
             "%{wks.location}/Engine/Modules/Core/Include",

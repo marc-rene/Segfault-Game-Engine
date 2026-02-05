@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TypeDefinitions.hpp"
+#include "Definitions_Global.hpp"
 #include "Log.hpp"
 
 int LINKTEST_FileWizardFolder();

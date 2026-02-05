@@ -9,9 +9,9 @@
 // https://medium.com/@ryan_forrester_/using-switch-statements-with-strings-in-c-a-complete-guide-efa12f64a59d
 
 /// Hash a String at Compile-time
-/// @param String constant to hash
-/// @return unsigned 64-bit int
-constexpr unsigned long long hash(std::string_view str)
+/// @param string constant to hash
+/// @return unsigned 64-bit int hash
+constexpr unsigned long long hash(std::string_view string)
 {
     unsigned long long hash = 0;
     for (char c : str)

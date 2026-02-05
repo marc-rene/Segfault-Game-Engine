@@ -2,7 +2,7 @@
 
 #include <string>
 #include "Log.hpp"
-#include "TypeDefinitions.hpp"
+#include "Definitions_Global.hpp"
 #include "Utilities.hpp"
 #include <string_view>
 

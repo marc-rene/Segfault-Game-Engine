@@ -5,7 +5,7 @@
 
 #include "DaVinci.hpp"
 #include "Nitpick.hpp"
-#include "TypeDefinitions.hpp"
+#include "Definitions_Global.hpp"
 #include "Log.hpp"
 
 

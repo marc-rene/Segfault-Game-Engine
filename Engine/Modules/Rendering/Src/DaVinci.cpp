@@ -1,3 +1,4 @@
+// ReSharper disable All
 #include "../Include/DaVinci.hpp"
 #include "../Include/DaVinci.hpp"
 
@@ -7,10 +8,11 @@
 #include <dxgi1_6.h>
 
 
+// NOLINT(clang-diagnostic-comment)
 
 #include <SDL3/SDL_init.h>
 #include "SDL3/SDL_video.h"
-/*
+/*  
 using namespace DirectX;
 
 
@@ -522,7 +524,7 @@ bool ENGINE::GRAPHICS::DaVinci::Check_Variable_Refresh_Rate_Support()
         }
     }
 
-    Render_Settings::Display_Settings::g_VariableRefreshRate = allowTearing == TRUE;
+    Render_Settings::Display_Info::g_VariableRefreshRate = allowTearing == TRUE;
 
     return allowTearing == TRUE;
 }
@@ -840,13 +842,13 @@ void ENGINE::GRAPHICS::DaVinci::Render()
         //g_Pipeline_Objects.g_CommandQueue_DIRECT->ExecuteCommandLists(_countof(commandLists), commandLists);
         g_Pipeline_Objects.g_CommandQueue_DIRECT->Execute_Command_List(commandLists);
 
-        UINT syncInterval = Render_Settings::Display_Settings::g_VSync ? 1 : 0;
+        UINT syncInterval = Render_Settings::Display_Info::g_VSync ? 1 : 0;
 
         // power mode == 1: Render but slower... not in focus  -  power mode == 2: Render as normal
         syncInterval = g_Pipeline_Objects.power_mode == 1 ? (syncInterval + 1) : syncInterval;
 
-        UINT presentFlags = Render_Settings::Display_Settings::g_VariableRefreshRate
-                            && !Render_Settings::Display_Settings::g_VSync
+        UINT presentFlags = Render_Settings::Display_Info::g_VariableRefreshRate
+                            && !Render_Settings::Display_Info::g_VSync
                                 ? DXGI_PRESENT_ALLOW_TEARING
                                 : 0;
 
@@ -927,8 +929,8 @@ void ENGINE::GRAPHICS::DaVinci::Render(D3D12_VERTEX_BUFFER_VIEW* p_VertexBufferV
         g_Pipeline_Objects.g_FrameFenceValues[g_Pipeline_Objects.g_CurrentBackBufferIndex] = 
             command_queue->Execute_Command_List(command_list);
 
-        UINT syncInterval = Render_Settings::Display_Settings::g_VSync ? 1 : 0;
-        UINT presentFlags = Render_Settings::Display_Settings::g_VariableRefreshRate && !Render_Settings::Display_Settings::g_VSync ? DXGI_PRESENT_ALLOW_TEARING : 0;
+        UINT syncInterval = Render_Settings::Display_Info::g_VSync ? 1 : 0;
+        UINT presentFlags = Render_Settings::Display_Info::g_VariableRefreshRate && !Render_Settings::Display_Info::g_VSync ? DXGI_PRESENT_ALLOW_TEARING : 0;
         g_Pipeline_Objects.g_SwapChain->Present(syncInterval, presentFlags);
         g_Pipeline_Objects.g_CurrentBackBufferIndex = g_Pipeline_Objects.g_SwapChain->GetCurrentBackBufferIndex();
 
@@ -999,12 +1001,12 @@ void ENGINE::GRAPHICS::DaVinci::Resize()
 
 void ENGINE::GRAPHICS::DaVinci::Set_FullScreen(bool use_fullscreen)
 {
-    if (Render_Settings::Display_Settings::g_Fullscreen != use_fullscreen)
+    if (Render_Settings::Display_Info::g_Fullscreen != use_fullscreen)
     {
-        Render_Settings::Display_Settings::g_Fullscreen = use_fullscreen;
+        Render_Settings::Display_Info::g_Fullscreen = use_fullscreen;
 
         SDL_SetWindowFullscreen(static_cast<SDL_Window*>(Get_Parent_Window_ptr()),
-                                Render_Settings::Display_Settings::g_Fullscreen);
+                                Render_Settings::Display_Info::g_Fullscreen);
     }
 }
 
